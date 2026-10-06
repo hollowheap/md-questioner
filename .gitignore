@@ -1,0 +1,8 @@
+node_modules/
+build/
+out/
+dist/scripts/md-questioner-bun
+artifacts/logs/
+artifacts/errors/
+*.log
+.DS_Store
