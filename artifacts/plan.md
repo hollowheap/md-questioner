@@ -24,7 +24,7 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 - [x] Goal 7: CLI & Hybrid Runtime Implementation (`src/cli.ts`, `src/runtime.ts`, Bun/Node branching, directory processing)
 - [x] Goal 8: Claude Skill Packaging & Binary Compilation (`dist/` layout, `SKILL.md`, references, host binary compilation)
 - [x] Goal 9: Comprehensive Verification & Audit (8 verification checks in `artifacts/VERIFICATION.md`)
-- [ ] Goal 10: Final Handoff Documentation & Polish
+- [x] Goal 10: Final Handoff Documentation & Polish
 
 ---
 
@@ -117,8 +117,8 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 - [x] Produce `artifacts/VERIFICATION.md` capturing all raw results.
 
 ### Phase 10: Commit History & Final Handoff
-- [ ] Create clean, conventional git commits.
-- [ ] Present comprehensive handoff summary and verification report.
+- [x] Create clean, conventional git commits.
+- [x] Present comprehensive handoff summary and verification report.
 
 ---
 
