@@ -116,7 +116,8 @@ When processing an H3 section, detection rules are evaluated in the following st
 
 | Priority | AST Match Pattern | Inferred Question Type | UI Interaction | Validation / Scoring Rule |
 | :---: | :--- | :--- | :--- | :--- |
-| **1** | H4 immediately under H3 (`#### <answer>`) | **Short Answer** | Single-line text input field | Case-insensitive trimmed match; Levenshtein distance $\le 1$ allowed |
+| **1a** | H4 heading `#### Rubric` with task list criteria | **Essay** | Textarea with word count, keyword concept highlighting, side-by-side model answer review, and interactive rubric checklist | Approach A + B: In-browser stemming concept matcher pre-checks detected points; student verifies checklist against model answer |
+| **1b** | Other H4 immediately under H3 (`#### <answer>`) | **Short Answer** | Single-line text input field | Case-insensitive trimmed match; Levenshtein distance $\le 1$ allowed |
 | **2** | GFM Table in question body | **Match Pairs** | Left column static prompts, right column dropdowns | All left items must match corresponding right items |
 | **3a** | Task list with exactly 2 items: "True" and "False" (case-insensitive) | **True / False** | Two toggle choice buttons | Selected option must match the single `[x]` |
 | **3b** | Task list with exactly one `[x]` and $>2$ items | **Multi Choice** | Radio options list | Single selection must match `[x]`; explanation paragraph shown on check |
@@ -145,7 +146,8 @@ export type QuestionType =
   | "true-false"
   | "match-pairs"
   | "short-answer"
-  | "reflection";
+  | "reflection"
+  | "essay";
 
 export interface ChoiceOption {
   id: string;
@@ -171,6 +173,8 @@ export interface Question {
   pairs?: MatchPair[];            // match-pairs
   canonicalAnswer?: string;       // short-answer
   fuzzyTolerance?: number;        // short-answer (default 1)
+  rubric?: string[];              // essay
+  modelAnswerHtml?: string;       // essay
 }
 
 export interface Section {

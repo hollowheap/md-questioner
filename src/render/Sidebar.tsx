@@ -1,4 +1,5 @@
 import React from "react";
+import { Box, Heading, Text, Button, ButtonText, VStack } from "@gluestack-ui/themed";
 import { Section } from "../parse/schema.js";
 import { Progress } from "./Progress.js";
 import { ThemeToggle } from "./ThemeToggle.js";
@@ -50,42 +51,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <div
+      <Box
         className={`mdq-overlay ${isOpen ? "open" : ""}`}
         onClick={onClose}
         aria-hidden="true"
       />
-      <aside className={`mdq-sidebar ${isOpen ? "open" : ""}`} aria-label="Quiz Navigation">
-        <div className="mdq-sidebar-header">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <h2 className="mdq-sidebar-title">{quizTitle}</h2>
+      <Box className={`mdq-sidebar ${isOpen ? "open" : ""}`} aria-label="Quiz Navigation" role="complementary">
+        <Box className="mdq-sidebar-header">
+          <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <Heading size="md" className="mdq-sidebar-title">{quizTitle}</Heading>
             {isOpen && (
-              <button
+              <Button
                 type="button"
                 className="mdq-btn mdq-btn-ghost"
                 onClick={onClose}
+                onPress={onClose}
                 aria-label="Close navigation drawer"
                 style={{ padding: "0.25rem 0.5rem", minHeight: "36px", minWidth: "36px" }}
               >
-                ✕
-              </button>
+                <ButtonText>✕</ButtonText>
+              </Button>
             )}
-          </div>
-          {quizDescription && <p className="mdq-sidebar-desc">{quizDescription}</p>}
-        </div>
+          </Box>
+          {quizDescription && <Text className="mdq-sidebar-desc">{quizDescription}</Text>}
+        </Box>
 
-        <nav className="mdq-sidebar-sections">
+        <Box className="mdq-sidebar-sections" role="navigation" aria-label="Quiz Sections">
           {sections.map((section, sIdx) => {
             const secProgress = sectionProgressList[sIdx];
             return (
-              <div key={section.id} className="mdq-sidebar-section">
-                <div className="mdq-sidebar-section-header">
-                  <span>{section.title}</span>
-                  <span>
+              <Box key={section.id} className="mdq-sidebar-section">
+                <Box className="mdq-sidebar-section-header">
+                  <Text>{section.title}</Text>
+                  <Text>
                     {secProgress.correct} / {secProgress.total}
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  </Text>
+                </Box>
+                <VStack style={{ gap: "2px" }}>
                   {section.questions.map((question, qIdx) => {
                     const isActive = sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
                     const ans = answeredQuestions[question.id];
@@ -104,47 +106,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }
 
                     return (
-                      <button
+                      <Button
                         key={question.id}
                         type="button"
+                        variant="link"
+                        action="secondary"
                         className={`mdq-sidebar-question-link ${isActive ? "active" : ""}`}
                         onClick={() => {
                           onSelect(sIdx, qIdx);
                           onClose();
                         }}
+                        onPress={() => {
+                          onSelect(sIdx, qIdx);
+                          onClose();
+                        }}
+                        style={{ justifyContent: "flex-start", paddingLeft: "0.65rem", paddingRight: "0.65rem" }}
                       >
-                        <span className={`mdq-status-icon ${statusClass}`}>{statusIcon}</span>
-                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <Text className={`mdq-status-icon ${statusClass}`}>{statusIcon}</Text>
+                        <ButtonText style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "inherit", fontWeight: isActive ? "600" : "400" }}>
                           {qIdx + 1}. {question.title}
-                        </span>
-                      </button>
+                        </ButtonText>
+                      </Button>
                     );
                   })}
-                </div>
-              </div>
+                </VStack>
+              </Box>
             );
           })}
-        </nav>
+        </Box>
 
-        <div className="mdq-sidebar-footer">
+        <Box className="mdq-sidebar-footer">
           <Progress
             total={totalQuestions}
             correct={totalCorrect}
             label="Overall Score"
           />
-          <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-            <button
+          <Box style={{ display: "flex", flexDirection: "row", gap: "0.5rem", marginTop: "1rem" }}>
+            <Button
+              variant="outline"
+              action="secondary"
               type="button"
               className="mdq-btn mdq-btn-secondary"
               onClick={onRetake}
+              onPress={onRetake}
               style={{ flex: 1, fontSize: "0.85rem", minHeight: "38px" }}
             >
-              🔄 Retake
-            </button>
+              <ButtonText>Retake</ButtonText>
+            </Button>
             <ThemeToggle />
-          </div>
-        </div>
-      </aside>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 };

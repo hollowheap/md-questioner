@@ -1,4 +1,5 @@
 import React from "react";
+import { Box, Heading, Text, Card } from "@gluestack-ui/themed";
 import { Question as QuestionData } from "../parse/schema.js";
 import { Hint } from "./Hint.js";
 import { MultiChoice } from "./question-types/MultiChoice.js";
@@ -7,6 +8,7 @@ import { TrueFalse } from "./question-types/TrueFalse.js";
 import { MatchPairs } from "./question-types/MatchPairs.js";
 import { ShortAnswer } from "./question-types/ShortAnswer.js";
 import { Reflection } from "./question-types/Reflection.js";
+import { Essay } from "./question-types/Essay.js";
 
 export interface QuestionProps {
   question: QuestionData;
@@ -18,6 +20,7 @@ export interface QuestionProps {
     userResponse: unknown;
   };
   onAnswer?: (response: unknown, isCorrect: boolean) => void;
+  disabled?: boolean;
 }
 
 export const Question: React.FC<QuestionProps> = ({
@@ -27,6 +30,7 @@ export const Question: React.FC<QuestionProps> = ({
   totalInSection = 1,
   savedAnswer,
   onAnswer,
+  disabled = false,
 }) => {
   const handleAnswer = (response: unknown, isCorrect: boolean) => {
     onAnswer?.(response, isCorrect);
@@ -74,6 +78,15 @@ export const Question: React.FC<QuestionProps> = ({
             onAnswer={handleAnswer}
           />
         );
+      case "essay":
+        return (
+          <Essay
+            question={question}
+            savedAnswer={savedAnswer}
+            onAnswer={(resp, ok) => handleAnswer(resp, ok)}
+            disabled={disabled}
+          />
+        );
       case "reflection":
       default:
         return (
@@ -87,17 +100,17 @@ export const Question: React.FC<QuestionProps> = ({
   };
 
   return (
-    <article className="mdq-card mdq-question" data-question-id={question.id}>
-      <header className="mdq-question-header">
-        <span className="mdq-question-meta">
+    <Card variant="outline" className="mdq-card mdq-question" data-question-id={question.id}>
+      <Box className="mdq-question-header">
+        <Text className="mdq-question-meta">
           {sectionTitle ? `${sectionTitle} • ` : ""}Question {questionIndex + 1} of {totalInSection}
-        </span>
-      </header>
+        </Text>
+      </Box>
 
-      <h3 className="mdq-question-title">{question.title}</h3>
+      <Heading size="md" className="mdq-question-title">{question.title}</Heading>
 
       {question.promptHtml && (
-        <div
+        <Box
           className="mdq-prompt"
           dangerouslySetInnerHTML={{ __html: question.promptHtml }}
         />
@@ -105,10 +118,10 @@ export const Question: React.FC<QuestionProps> = ({
 
       {question.hint && <Hint hint={question.hint} />}
 
-      <div className="mdq-interaction-container">
+      <Box className="mdq-interaction-container">
         {renderQuestionBody()}
-      </div>
-    </article>
+      </Box>
+    </Card>
   );
 };
 

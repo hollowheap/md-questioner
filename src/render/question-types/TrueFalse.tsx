@@ -1,5 +1,12 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Box,
+  Text,
+  Button,
+  ButtonText,
+  HStack,
+} from "@gluestack-ui/themed";
 
 export interface TrueFalseProps {
   question: Question;
@@ -57,46 +64,50 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
     }
 
     return (
-      <button
+      <Button
         key={opt.id}
-        type="button"
+        variant={isSelected ? "solid" : "outline"}
+        action={isSelected ? "primary" : "secondary"}
         className={`mdq-tf-btn ${isSelected ? "selected" : ""} ${statusClass}`}
-        disabled={isLocked || disabled}
+        isDisabled={isLocked || disabled}
         onClick={() => handleSelect(opt.id)}
+        onPress={() => handleSelect(opt.id)}
       >
-        {label}
-      </button>
+        <ButtonText style={{ color: "inherit" }}>{label}</ButtonText>
+      </Button>
     );
   };
 
   return (
-    <div className="mdq-true-false">
-      <div className="mdq-tf-group">
+    <Box className="mdq-true-false">
+      <HStack className="mdq-tf-group">
         {renderButton(trueOption, "True")}
         {renderButton(falseOption, "False")}
-      </div>
+      </HStack>
 
       {!isLocked && (
-        <button
-          type="button"
+        <Button
+          variant="solid"
+          action="primary"
           className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
-          disabled={!selectedId || disabled}
+          onPress={handleCheck}
+          isDisabled={!selectedId || disabled}
         >
-          Check Answer
-        </button>
+          <ButtonText>Check Answer</ButtonText>
+        </Button>
       )}
 
       {isLocked && question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Explanation</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Explanation</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

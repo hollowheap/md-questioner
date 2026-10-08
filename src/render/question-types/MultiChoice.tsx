@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Box,
+  Text,
+  Button,
+  ButtonText,
+} from "@gluestack-ui/themed";
 
 export interface MultiChoiceProps {
   question: Question;
@@ -38,8 +44,8 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
   };
 
   return (
-    <div className="mdq-multi-choice">
-      <div className="mdq-options-list" role="radiogroup" aria-label={question.title}>
+    <Box className="mdq-multi-choice">
+      <Box className="mdq-options-list" role="radiogroup" aria-label={question.title}>
         {options.map((opt) => {
           const isSelected = selectedId === opt.id;
           let statusClass = "";
@@ -66,33 +72,35 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
                 disabled={isLocked || disabled}
                 onChange={() => handleSelect(opt.id)}
               />
-              <span className="mdq-option-text">{opt.text}</span>
+              <Text className="mdq-option-text">{opt.text}</Text>
             </label>
           );
         })}
-      </div>
+      </Box>
 
       {!isLocked && (
-        <button
-          type="button"
+        <Button
+          variant="solid"
+          action="primary"
           className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
-          disabled={!selectedId || disabled}
+          onPress={handleCheck}
+          isDisabled={!selectedId || disabled}
         >
-          Check Answer
-        </button>
+          <ButtonText>Check Answer</ButtonText>
+        </Button>
       )}
 
       {isLocked && question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Explanation</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Explanation</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

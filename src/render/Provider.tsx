@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { gluestackCustomConfig } from "../styles/gluestack.config.js";
 
 export type Theme = "light" | "dark" | "auto";
 export type ResolvedTheme = "light" | "dark";
@@ -84,7 +86,9 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
-      {children}
+      <GluestackUIProvider config={gluestackCustomConfig} colorMode={resolvedTheme}>
+        {children}
+      </GluestackUIProvider>
     </ThemeContext.Provider>
   );
 };

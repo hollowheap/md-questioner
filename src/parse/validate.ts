@@ -92,6 +92,7 @@ export const quizModelSchema = {
             "match-pairs",
             "short-answer",
             "reflection",
+            "essay",
           ],
         },
         hint: { type: "string" },
@@ -108,6 +109,11 @@ export const quizModelSchema = {
         },
         canonicalAnswer: { type: "string" },
         fuzzyTolerance: { type: "number" },
+        rubric: {
+          type: "array",
+          items: { type: "string" },
+        },
+        modelAnswerHtml: { type: "string" },
       },
       additionalProperties: false,
     },
@@ -230,6 +236,14 @@ export function validateQuizModel(model: QuizModel, filePath?: string): void {
         if (!q.canonicalAnswer || q.canonicalAnswer.trim().length === 0) {
           throw new SchemaValidationError(
             `Short-answer question "${q.title}" must have a canonical answer`,
+            q.sourceLine,
+            filePath
+          );
+        }
+      } else if (q.type === "essay") {
+        if (!q.rubric || q.rubric.length === 0) {
+          throw new SchemaValidationError(
+            `Essay question "${q.title}" must have rubric criteria`,
             q.sourceLine,
             filePath
           );

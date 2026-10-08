@@ -1,5 +1,13 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Input,
+  InputField,
+  Button,
+  ButtonText,
+  Box,
+  Text,
+} from "@gluestack-ui/themed";
 
 function levenshtein(a: string, b: string): number {
   const m = a.length;
@@ -56,7 +64,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
     onAnswer?.(trimmed, isCorrect);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<any>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmit();
@@ -66,45 +74,56 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
   const isCorrect = savedAnswer ? savedAnswer.isCorrect : false;
 
   return (
-    <div className="mdq-short-answer">
-      <div className="mdq-short-answer-group">
-        <input
-          type="text"
+    <Box className="mdq-short-answer">
+      <Box className="mdq-short-answer-group">
+        <Input
+          variant="outline"
+          size="md"
           className={`mdq-short-input ${isLocked ? (isCorrect ? "is-correct" : "is-incorrect") : ""}`}
-          placeholder="Type your answer here..."
-          value={value}
-          disabled={isLocked || disabled}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+          isDisabled={isLocked || disabled}
+        >
+          <InputField
+            type="text"
+            placeholder="Type your answer here..."
+            value={value}
+            disabled={isLocked || disabled}
+            onChange={(e: any) => setValue(e.target?.value ?? e)}
+            onChangeText={(text: string) => setValue(text)}
+            onKeyDown={handleKeyDown}
+          />
+        </Input>
         {isLocked && !isCorrect && canonical && (
-          <div style={{ fontSize: "0.9rem", color: "var(--color-error)", marginTop: "0.25rem" }}>
-            Expected: <strong>{canonical}</strong>
-          </div>
+          <Box style={{ fontSize: "0.9rem", color: "var(--color-error)", marginTop: "0.25rem" }}>
+            <Text style={{ fontSize: "0.9rem", color: "var(--color-error)" }}>
+              Expected: <strong>{canonical}</strong>
+            </Text>
+          </Box>
         )}
-      </div>
+      </Box>
 
       {!isLocked && (
-        <button
-          type="button"
+        <Button
+          variant="solid"
+          action="primary"
           className="mdq-btn mdq-btn-primary"
           onClick={handleSubmit}
-          disabled={!value.trim() || disabled}
+          onPress={handleSubmit}
+          isDisabled={!value.trim() || disabled}
         >
-          Check Answer
-        </button>
+          <ButtonText>Check Answer</ButtonText>
+        </Button>
       )}
 
       {isLocked && question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Explanation</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Explanation</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

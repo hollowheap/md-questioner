@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Box,
+  Text,
+  Button,
+  ButtonText,
+} from "@gluestack-ui/themed";
 
 export interface MultiSelectProps {
   question: Question;
@@ -43,8 +49,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   };
 
   return (
-    <div className="mdq-multi-select">
-      <div className="mdq-options-list" role="group" aria-label={question.title}>
+    <Box className="mdq-multi-select">
+      <Box className="mdq-options-list" role="group" aria-label={question.title}>
         {options.map((opt) => {
           const isSelected = selectedIds.includes(opt.id);
           let statusClass = "";
@@ -74,33 +80,35 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                 disabled={isLocked || disabled}
                 onChange={() => handleToggle(opt.id)}
               />
-              <span className="mdq-option-text">{opt.text}</span>
+              <Text className="mdq-option-text">{opt.text}</Text>
             </label>
           );
         })}
-      </div>
+      </Box>
 
       {!isLocked && (
-        <button
-          type="button"
+        <Button
+          variant="solid"
+          action="primary"
           className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
-          disabled={selectedIds.length === 0 || disabled}
+          onPress={handleCheck}
+          isDisabled={selectedIds.length === 0 || disabled}
         >
-          Check Answer
-        </button>
+          <ButtonText>Check Answer</ButtonText>
+        </Button>
       )}
 
       {isLocked && question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Explanation</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Explanation</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

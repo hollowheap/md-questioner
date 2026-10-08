@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Textarea,
+  TextareaInput,
+  Box,
+  Text,
+} from "@gluestack-ui/themed";
 
 export interface ReflectionProps {
   question: Question;
@@ -21,36 +27,42 @@ export const Reflection: React.FC<ReflectionProps> = ({
     return typeof savedAnswer?.userResponse === "string" ? savedAnswer.userResponse : "";
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = e.target.value;
+  const handleUpdate = (val: string) => {
     setText(val);
     // Auto-mark as practiced on input or keep state updated
     onAnswer?.(val, true);
   };
 
+  const handleChange = (e: any) => {
+    const val = typeof e === "string" ? e : (e?.target?.value ?? "");
+    handleUpdate(val);
+  };
+
   return (
-    <div className="mdq-reflection">
-      <div className="mdq-reflection-group">
-        <textarea
-          className="mdq-reflection-textarea"
-          placeholder="Reflect on this question, write down your reasoning, or take study notes..."
-          value={text}
-          disabled={disabled}
-          onChange={handleChange}
-          rows={5}
-        />
-      </div>
+    <Box className="mdq-reflection">
+      <Box className="mdq-reflection-group">
+        <Textarea size="md" className="mdq-reflection-textarea" isDisabled={disabled}>
+          <TextareaInput
+            placeholder="Reflect on this question, write down your reasoning, or take study notes..."
+            value={text}
+            disabled={disabled}
+            onChange={handleChange}
+            onChangeText={handleUpdate}
+            rows={5}
+          />
+        </Textarea>
+      </Box>
 
       {question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Suggested Notes & Key Takeaways</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Suggested Notes & Key Takeaways</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

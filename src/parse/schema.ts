@@ -4,7 +4,8 @@ export type QuestionType =
   | "true-false"
   | "match-pairs"
   | "short-answer"
-  | "reflection";
+  | "reflection"
+  | "essay";
 
 export interface ChoiceOption {
   id: string;
@@ -29,6 +30,8 @@ export interface Question {
   pairs?: MatchPair[];
   canonicalAnswer?: string;
   fuzzyTolerance?: number;
+  rubric?: string[];
+  modelAnswerHtml?: string;
 }
 
 export interface Section {

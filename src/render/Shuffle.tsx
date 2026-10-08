@@ -1,4 +1,5 @@
 import React from "react";
+import { Button, ButtonText } from "@gluestack-ui/themed";
 
 export interface ShuffleProps {
   isShuffled?: boolean;
@@ -23,16 +24,19 @@ export const Shuffle: React.FC<ShuffleProps> = ({
   };
 
   return (
-    <button
+    <Button
+      variant={isShuffled ? "solid" : "outline"}
+      action={isShuffled ? "primary" : "secondary"}
       type="button"
       className={`mdq-btn ${isShuffled ? "mdq-btn-primary" : "mdq-btn-secondary"}`}
       onClick={handleClick}
+      onPress={handleClick}
       title={isShuffled ? "Restore original order" : "Shuffle questions in this section"}
       aria-pressed={isShuffled}
       style={{ fontSize: "0.85rem", padding: "0.4rem 0.8rem", minHeight: "38px" }}
     >
-      🔀 {isShuffled ? "Shuffled" : "Shuffle"}
-    </button>
+      <ButtonText>{isShuffled ? "Shuffled" : "Shuffle"}</ButtonText>
+    </Button>
   );
 };
 

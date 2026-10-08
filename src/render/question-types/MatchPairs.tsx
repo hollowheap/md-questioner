@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { Question } from "../../parse/schema.js";
+import {
+  Box,
+  Text,
+  Button,
+  ButtonText,
+} from "@gluestack-ui/themed";
 
 export interface MatchPairsProps {
   question: Question;
@@ -58,8 +64,8 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
   };
 
   return (
-    <div className="mdq-match-pairs">
-      <div className="mdq-match-list">
+    <Box className="mdq-match-pairs">
+      <Box className="mdq-match-list">
         {pairs.map((pair, idx) => {
           const selectedAnswer = matches[pair.prompt] || "";
           const isRowCorrect = isLocked && selectedAnswer === pair.answer;
@@ -70,9 +76,9 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
           else if (isRowIncorrect) rowClass = "is-incorrect";
 
           return (
-            <div key={`${question.id}-${idx}`} className={`mdq-match-row ${rowClass}`}>
-              <div className="mdq-match-prompt">{pair.prompt}</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, maxWidth: "280px" }}>
+            <Box key={`${question.id}-${idx}`} className={`mdq-match-row ${rowClass}`}>
+              <Text className="mdq-match-prompt">{pair.prompt}</Text>
+              <Box style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, maxWidth: "280px" }}>
                 <select
                   className="mdq-match-select"
                   value={selectedAnswer}
@@ -88,37 +94,39 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
                   ))}
                 </select>
                 {isRowIncorrect && (
-                  <span style={{ fontSize: "0.8rem", color: "var(--color-error)" }}>
+                  <Text style={{ fontSize: "0.8rem", color: "var(--color-error)" }}>
                     Correct: {pair.answer}
-                  </span>
+                  </Text>
                 )}
-              </div>
-            </div>
+              </Box>
+            </Box>
           );
         })}
-      </div>
+      </Box>
 
       {!isLocked && (
-        <button
-          type="button"
+        <Button
+          variant="solid"
+          action="primary"
           className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
-          disabled={!allSelected || disabled}
+          onPress={handleCheck}
+          isDisabled={!allSelected || disabled}
         >
-          Check Matches
-        </button>
+          <ButtonText>Check Matches</ButtonText>
+        </Button>
       )}
 
       {isLocked && question.explanationHtml && (
-        <div className="mdq-explanation">
-          <div className="mdq-explanation-title">Explanation</div>
+        <Box className="mdq-explanation">
+          <Text className="mdq-explanation-title">Explanation</Text>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

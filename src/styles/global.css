@@ -66,7 +66,8 @@ pre code {
 
 /* Responsive layout */
 .mdq-root {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   min-height: 100vh;
   background-color: var(--color-canvas);
   color: var(--color-text);
@@ -91,28 +92,31 @@ pre code {
 
 /* Top bar with mobile hamburger and utilities */
 .mdq-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
   padding: 0.75rem 1.25rem;
   border-bottom: 1px solid var(--color-border);
   background: var(--color-card);
 }
 
 .mdq-top-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
 }
 
 .mdq-top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
 }
 
 .mdq-menu-toggle {
-  display: none;
+  display: none !important;
   background: none;
   border: 1px solid var(--color-border);
   border-radius: 6px;
@@ -243,8 +247,12 @@ pre code {
 
 /* Mobile Drawer styles */
 @media (max-width: 1023px) {
+  .mdq-root {
+    flex-direction: column !important;
+  }
+
   .mdq-menu-toggle {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
   }
@@ -676,9 +684,10 @@ pre code {
   border-top: 1px solid var(--color-border);
   padding: 0.75rem 1.25rem;
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 90;
 }
@@ -753,4 +762,209 @@ pre code {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.mdq-essay {
+  display: flex;
+  flex-direction: column;
+}
+
+.mdq-essay-draft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.mdq-essay-textarea-wrap {
+  width: 100%;
+}
+
+.mdq-essay-textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.mdq-essay-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.mdq-essay-draft-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mdq-essay-counts {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.mdq-essay-review {
+  display: flex;
+  flex-direction: column;
+}
+
+.mdq-essay-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.mdq-essay-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.mdq-essay-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.mdq-essay-panel {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.mdq-essay-panel-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin-bottom: 0.75rem;
+}
+
+.mdq-essay-submission-text {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mdq-essay-panel-body {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+}
+
+.mdq-essay-panel-body p:last-child {
+  margin-bottom: 0;
+}
+
+.mdq-essay-match {
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent);
+  font-weight: 600;
+  padding: 0.1em 0.25em;
+  border-radius: 3px;
+}
+
+.mdq-rubric-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.mdq-rubric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mdq-rubric-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.mdq-rubric-score {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-accent);
+}
+
+.mdq-rubric-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mdq-rubric-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.mdq-rubric-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.mdq-rubric-checkbox {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.15rem;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mdq-rubric-text {
+  color: var(--color-text);
+}
+
+.mdq-essay-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
 }

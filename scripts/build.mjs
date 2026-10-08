@@ -11,6 +11,40 @@ async function build() {
   console.log("[build] Building md-questioner client assets and CLI...");
 
   // 1. Bundle React Client
+  const assetRegistryPlugin = {
+    name: "asset-registry-stub",
+    setup(build) {
+      build.onResolve({ filter: /@react-native\/assets-registry/ }, (args) => ({
+        path: args.path,
+        namespace: "asset-stub",
+      }));
+      build.onLoad({ filter: /.*/, namespace: "asset-stub" }, () => ({
+        contents:
+          "export function getAssetByID() { return null; }; export default { getAssetByID };",
+        loader: "js",
+      }));
+    },
+  };
+
+  const rnwClassNamePlugin = {
+    name: "react-native-web-classname-plugin",
+    setup(build) {
+      build.onLoad({ filter: /forwardedProps[/\\]index\.js$/ }, async (args) => {
+        let src = await fs.readFile(args.path, "utf8");
+        src = src.replace("children: true,", "children: true,\n  className: true,");
+        return { contents: src, loader: "js" };
+      });
+      build.onLoad({ filter: /createDOMProps[/\\]index\.js$/ }, async (args) => {
+        let src = await fs.readFile(args.path, "utf8");
+        src = src.replace(
+          "if (className) {\n    domProps.className = className;\n  }",
+          "if (className) {\n    domProps.className = (props && props.className) ? className + \" \" + props.className : className;\n  } else if (props && props.className) {\n    domProps.className = props.className;\n  }"
+        );
+        return { contents: src, loader: "js" };
+      });
+    },
+  };
+
   const entryPath = path.resolve(rootDir, "src/render/entry.tsx");
   console.log(`[build] Bundling React client from ${entryPath}`);
   const clientBuild = await esbuild.build({
@@ -24,7 +58,24 @@ async function build() {
     jsx: "automatic",
     define: {
       "process.env.NODE_ENV": '"production"',
+      "__DEV__": "false",
+      "global": "window",
     },
+    alias: {
+      "react-native": "react-native-web",
+    },
+    resolveExtensions: [
+      ".web.js",
+      ".web.jsx",
+      ".web.ts",
+      ".web.tsx",
+      ".mjs",
+      ".js",
+      ".jsx",
+      ".ts",
+      ".tsx",
+    ],
+    plugins: [assetRegistryPlugin, rnwClassNamePlugin],
   });
   const clientJs = clientBuild.outputFiles?.[0]?.text || "";
 

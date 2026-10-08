@@ -11,10 +11,15 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 3. **Environment & Headless Browser**: Verified availability of `chromium` via `nix-shell -p chromium` and `bun` via `nix-shell -p bun` on host. Headless verification will leverage Chromium in headless mode.
 4. **Node Binary Strategy**: Attempt native packaging via `@yao-pkg/pkg`; seamlessly fallback to an executable Node launcher shim (`#!/usr/bin/env node`) with inlined bundle if binary packaging is restricted by host environment (e.g., NixOS sandbox).
 5. **Project Artifacts Location**: All specification, tracking, and verification reports reside exclusively in `artifacts/` (`artifacts/plan.md`, `artifacts/SPEC.md`, `artifacts/VERIFICATION.md`, `artifacts/repomap.md`).
+6. **Essay Questions Architecture (Approaches A + B)**: Purely deterministic client-side implementation. No LLMs (`window.ai` or external APIs). Combines:
+   - Approach A: Guided self-grading rubric with side-by-side comparison against model answer.
+   - Approach B: Lightweight in-browser Porter stemmer & concept keyword matching highlighting detected points and pre-checking matched rubric criteria.
+7. **Clean Typographic Aesthetic (No Icons)**: Eliminate emoji icons (💡, ☀️, 🌙, 💻, etc.) across all components in favor of clean, calm, text-only labels matching the steep.app design philosophy.
+8. **Gluestack UI Component Architecture**: Full adoption of Gluestack UI primitives (`Box`, `Button`, `Text`, `Heading`, `Progress`, `Radio`, `Checkbox`, `Textarea`, `Input`) wrapped in `GluestackUIProvider` with Refero steep.app light and AA dark design token overrides. Bundle size constraint relaxed as confirmed by user.
 
 ---
 
-## Master List of Goals
+#### Master List of Goals
 - [x] Goal 1: Architecture Specification & Planning (`artifacts/SPEC.md`)
 - [x] Goal 2: Project Scaffolding & Configuration (`package.json`, `tsconfig.json`, `.swcrc`, `esbuild.config.ts`)
 - [x] Goal 3: Core Parser Implementation (`src/parse/` with AST, frontmatter, schema, validation, line-aware error reporting)
@@ -25,6 +30,8 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 - [x] Goal 8: Claude Skill Packaging & Binary Compilation (`dist/` layout, `SKILL.md`, references, host binary compilation)
 - [x] Goal 9: Comprehensive Verification & Audit (8 verification checks in `artifacts/VERIFICATION.md`)
 - [x] Goal 10: Final Handoff Documentation & Polish
+- [x] Goal 11: Essay Question Support & Clean Typographic UI Polish
+- [x] Goal 12: Gluestack UI Component Migration & Design Token Overrides
 
 ---
 
@@ -120,6 +127,22 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 - [x] Create clean, conventional git commits.
 - [x] Present comprehensive handoff summary and verification report.
 
+### Phase 11: Essay Question Support & Clean Typographic UI Polish
+- [x] Task 11.1: Update `src/parse/schema.ts` and `dist/reference/schema.json` to define `QuestionType` union with `"essay"`, plus optional `rubric: string[]` and `modelAnswerHtml?: string`.
+- [x] Task 11.2: Update `src/parse/markdown.ts` to detect `essay` questions when an H3 contains `#### Rubric` (task list of criteria) and optional `#### Model Answer` (reference answer).
+- [x] Task 11.3: Implement lightweight client-side stemming & concept matching utility `src/render/nlp/conceptMatcher.ts` (Approach B).
+- [x] Task 11.4: Implement `src/render/question-types/Essay.tsx` featuring draft textarea, word counter, concept highlighting, side-by-side model answer comparison, and interactive self-scoring rubric checklist (Approach A + B).
+- [x] Task 11.5: Remove all emoji icons (💡, ☀️, 🌙, 💻, etc.) across all components (`Hint.tsx`, `ThemeToggle.tsx`, `Sidebar.tsx`, etc.) to enforce a calm, text-only design aesthetic.
+- [x] Task 11.6: Update `test/fixtures/full-feature.md`, parser tests (`test/parser.test.ts`), and reference documentation (`dist/reference/schema.md`, `dist/reference/example.md`).
+- [x] Task 11.7: Rebuild bundle, re-run full test suite (`npm test`), and execute §10 verification check.
+
+### Phase 12: Gluestack UI Component Migration & Design Token Overrides
+- [x] Task 12.1: Design token config overrides (`src/styles/gluestack.config.ts`) defining steep.app light & AA dark tokens for Gluestack (`createConfig` from `@gluestack-ui/themed` / `@gluestack-style/react`).
+- [x] Task 12.2: Esbuild bundling configuration in `scripts/build.mjs` and `esbuild.config.ts` for Gluestack Web compilation (resolve aliases for `react-native` -> `react-native-web`, asset stub, and `__DEV__` definition).
+- [x] Task 12.3: Upgrade `src/render/Provider.tsx` to mount authentic `GluestackUIProvider` initialized with design token overrides and responsive/theme listeners.
+- [x] Task 12.4: Refactor UI components to Gluestack primitives (`Box`, `Button`, `ButtonText`, `Text`, `Heading`, `Progress`, `Radio`, `Checkbox`, `Textarea`, `Input`, `VStack`, `HStack`).
+- [x] Task 12.5: Verify standalone offline bundling, test suite passing (`npm test`), and Playwright headless verification (`npm run verify`).
+
 ---
 
 ## Validation Matrix
@@ -129,7 +152,10 @@ Build `md-questioner`, a CLI compiler that transforms Markdown study-guide files
 | **Render Smoke** | Single HTML file | All `<style>` and `<script>` inlined; no external CDN / link tags |
 | **Offline Verification** | Headless browser | Zero network calls intercepted; `data-testid="mdq-root"` hydrated |
 | **Style Application** | Computed CSS | Serif font stack for body/headings; AA dark accent on controls |
-| **Bundle Size Budget** | Emitted HTML file | Strictly < 10 MB (typically ~300KB-800KB) |
+| **Bundle Size Budget** | Emitted HTML file | Valid standalone HTML (budget relaxed per user directive) |
 | **Mobile Responsiveness**| 375×667 viewport | Sidebar collapses to drawer; stepper stays fixed |
 | **Theme Toggle** | `[data-theme]` | Toggling flips attribute between light and dark |
 | **Directory Batching** | `test/fixtures/multi-file/`| 2 `.md` files map to 2 `.html` files in target directory |
+| **Essay Grading (A + B)**| `src/render/question-types/Essay.tsx`| Client-side concept matching highlights keywords; rubric scoring updates score; side-by-side review renders correctly |
+| **Iconless Clean UI** | Rendered DOM | Zero emoji icons (💡, ☀️, 🌙, 💻); all controls use refined typography |
+| **Gluestack UI Adoption**| Rendered DOM | Components rendered with Gluestack UI provider & steep.app design token overrides |

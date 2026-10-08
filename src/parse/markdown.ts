@@ -240,17 +240,63 @@ function parseQuestion(
     }
   }
 
-  let h4Index = -1;
-  let canonicalAnswerText = "";
+  interface H4Block {
+    index: number;
+    title: string;
+  }
+  const h4Headings: H4Block[] = [];
   for (let i = 0; i < lines.length; i++) {
     if (!isFenceAt[i]) {
       const heading = matchHeading(lines[i].text, 4);
       if (heading !== null) {
-        h4Index = i;
-        canonicalAnswerText = heading;
-        break;
+        h4Headings.push({ index: i, title: heading });
       }
     }
+  }
+
+  const rubricH4 = h4Headings.find((h) => /^(rubric|criteria)$/i.test(h.title));
+  const modelAnswerH4 = h4Headings.find((h) => /^(model answer|exemplar)$/i.test(h.title));
+
+  let rubric: string[] | undefined;
+  if (rubricH4) {
+    const nextH4 = h4Headings.find((h) => h.index > rubricH4.index);
+    const rubricEndIndex = nextH4 ? nextH4.index : lines.length;
+    const rubricLines = lines.slice(rubricH4.index + 1, rubricEndIndex);
+
+    const taskRegex = /^\s*[-*+]\s*\[([ xX])\]\s*(.*)$/;
+    const items: string[] = [];
+    for (let i = 0; i < rubricLines.length; i++) {
+      const match = rubricLines[i].text.match(taskRegex);
+      if (match) {
+        items.push(match[2].trim());
+      } else if (
+        items.length > 0 &&
+        /^\s{2,}\S/.test(rubricLines[i].text) &&
+        !rubricLines[i].text.trim().startsWith("#")
+      ) {
+        items[items.length - 1] += " " + rubricLines[i].text.trim();
+      }
+    }
+    if (items.length === 0) {
+      const bulletRegex = /^\s*[-*+]\s+(.*)$/;
+      for (let i = 0; i < rubricLines.length; i++) {
+        const match = rubricLines[i].text.match(bulletRegex);
+        if (match) {
+          items.push(match[1].trim());
+        }
+      }
+    }
+    if (items.length > 0) {
+      rubric = items;
+    }
+  }
+
+  let modelAnswerHtml: string | undefined;
+  if (modelAnswerH4) {
+    const nextH4 = h4Headings.find((h) => h.index > modelAnswerH4.index);
+    const modelEndIndex = nextH4 ? nextH4.index : lines.length;
+    const modelLines = lines.slice(modelAnswerH4.index + 1, modelEndIndex);
+    modelAnswerHtml = renderMarkdown(modelLines.map((l) => l.text).join("\n"));
   }
 
   const table = findTable(lines, isFenceAt);
@@ -265,12 +311,19 @@ function parseQuestion(
   let canonicalAnswer: string | undefined;
   let fuzzyTolerance: number | undefined;
 
-  if (h4Index !== -1) {
+  if (rubric !== undefined && rubric.length > 0) {
+    type = "essay";
+    const essayIndices = [rubricH4?.index, modelAnswerH4?.index].filter(
+      (idx): idx is number => idx !== undefined
+    );
+    answerStartIndex = Math.min(...essayIndices);
+    answerEndIndex = lines.length - 1;
+  } else if (h4Headings.length > 0) {
     type = "short-answer";
-    canonicalAnswer = canonicalAnswerText;
+    canonicalAnswer = h4Headings[0].title;
     fuzzyTolerance = 1;
-    answerStartIndex = h4Index;
-    answerEndIndex = h4Index;
+    answerStartIndex = h4Headings[0].index;
+    answerEndIndex = h4Headings[0].index;
   } else if (table !== null) {
     type = "match-pairs";
     pairs = table.pairs;
@@ -363,6 +416,8 @@ function parseQuestion(
     ...(pairs ? { pairs } : {}),
     ...(canonicalAnswer !== undefined ? { canonicalAnswer } : {}),
     ...(fuzzyTolerance !== undefined ? { fuzzyTolerance } : {}),
+    ...(rubric ? { rubric } : {}),
+    ...(modelAnswerHtml ? { modelAnswerHtml } : {}),
   };
 }
 
@@ -458,7 +513,7 @@ export function parseMarkdown(
     if (!contentFenceAt[i]) {
       const h2 = matchHeading(contentLines[i].text, 2);
       if (h2 !== null) {
-        if (currentSecTitle !== null || currentSecLines.length > 0) {
+        if (currentSecTitle !== null || currentSecLines.some((l) => l.text.trim().length > 0)) {
           sectionBlocks.push({
             title: currentSecTitle ?? "General",
             lines: currentSecLines,
@@ -472,7 +527,7 @@ export function parseMarkdown(
     currentSecLines.push(contentLines[i]);
   }
 
-  if (currentSecTitle !== null || currentSecLines.length > 0) {
+  if (currentSecTitle !== null || currentSecLines.some((l) => l.text.trim().length > 0)) {
     sectionBlocks.push({
       title: currentSecTitle ?? "General",
       lines: currentSecLines,
@@ -566,8 +621,11 @@ export function parseMarkdown(
     };
   });
 
+  const nonEmptySections = sections.filter((s) => s.questions.length > 0);
+  const finalSections = nonEmptySections.length > 0 ? nonEmptySections : sections;
+
   const contentHash = createHash("sha256").update(cleanMarkdown).digest("hex");
-  const totalQuestions = sections.reduce((sum, s) => sum + s.questions.length, 0);
+  const totalQuestions = finalSections.reduce((sum, s) => sum + s.questions.length, 0);
   const title = h1Title ?? (frontmatter.title as string | undefined) ?? "";
   const description =
     leadInDescription ?? (frontmatter.description as string | undefined) ?? undefined;
@@ -576,7 +634,7 @@ export function parseMarkdown(
     title,
     ...(description ? { description } : {}),
     frontmatter,
-    sections,
+    sections: finalSections,
     contentHash,
     totalQuestions,
   };

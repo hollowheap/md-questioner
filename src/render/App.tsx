@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Box, Text, Heading, Button, ButtonText } from "@gluestack-ui/themed";
 import { QuizModel, Section, Question as QuestionData } from "../parse/schema.js";
 import { GluestackThemeProvider } from "./Provider.js";
 import { Sidebar } from "./Sidebar.js";
@@ -27,9 +28,9 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
   if (!quizModel || !quizModel.sections || quizModel.sections.length === 0) {
     return (
-      <div data-testid="mdq-root" className="mdq-root" style={{ padding: "2rem" }}>
-        <p>No quiz content available.</p>
-      </div>
+      <Box data-testid="mdq-root" testID="mdq-root" className="mdq-root" style={{ padding: "2rem" }}>
+        <Text>No quiz content available.</Text>
+      </Box>
     );
   }
 
@@ -179,7 +180,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
   return (
     <GluestackThemeProvider>
-      <div data-testid="mdq-root" className="mdq-root">
+      <Box data-testid="mdq-root" testID="mdq-root" className="mdq-root" style={{ flexDirection: "row", minHeight: "100vh" }}>
         <Sidebar
           quizTitle={quizModel.title}
           quizDescription={quizModel.description}
@@ -193,23 +194,26 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           onRetake={() => setShowRetakeModal(true)}
         />
 
-        <main className="mdq-main">
-          <div className="mdq-top-bar">
-            <div className="mdq-top-bar-left">
-              <button
+        <Box className="mdq-main" role="main">
+          <Box className="mdq-top-bar" style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <Box className="mdq-top-bar-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.75rem" }}>
+              <Button
+                variant="outline"
+                action="secondary"
                 type="button"
-                className="mdq-menu-toggle"
+                className="mdq-btn mdq-menu-toggle"
                 onClick={() => setIsDrawerOpen(true)}
+                onPress={() => setIsDrawerOpen(true)}
                 aria-label="Open navigation menu"
               >
-                ☰
-              </button>
-              <span style={{ fontWeight: 600, fontSize: "1.05rem" }}>
+                <ButtonText>☰</ButtonText>
+              </Button>
+              <Text style={{ fontWeight: 600, fontSize: "1.05rem" }}>
                 {quizModel.title}
-              </span>
-            </div>
+              </Text>
+            </Box>
 
-            <div className="mdq-top-bar-right">
+            <Box className="mdq-top-bar-right" style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
               <Shuffle
                 isShuffled={isShuffled}
                 onToggle={() => {
@@ -218,10 +222,10 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                 }}
                 noShuffle={noShuffle}
               />
-            </div>
-          </div>
+            </Box>
+          </Box>
 
-          <div className="mdq-content-container">
+          <Box className="mdq-content-container">
             <SectionTabs
               sections={quizModel.sections}
               activeIndex={activeSectionIndex}
@@ -239,9 +243,9 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                 onAnswer={handleAnswerQuestion}
               />
             ) : (
-              <p>No questions found in this section.</p>
+              <Text>No questions found in this section.</Text>
             )}
-          </div>
+          </Box>
 
           <Stepper
             current={activeQuestionIndex}
@@ -251,40 +255,49 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
             onPrev={handlePrev}
             onNext={handleNext}
           />
-        </main>
+        </Box>
 
         {showRetakeModal && (
-          <div className="mdq-modal-backdrop" onClick={() => setShowRetakeModal(false)}>
-            <div className="mdq-modal" onClick={(e) => e.stopPropagation()}>
-              <h4>Retake Quiz</h4>
-              <p>Would you like to reset your progress for the current section or the entire quiz?</p>
-              <div className="mdq-modal-actions">
-                <button
+          <Box className="mdq-modal-backdrop" onClick={() => setShowRetakeModal(false)}>
+            <Box className="mdq-modal" onClick={(e: any) => e?.stopPropagation?.()}>
+              <Heading size="md" className="mdq-modal-title">Retake Quiz</Heading>
+              <Text>Would you like to reset your progress for the current section or the entire quiz?</Text>
+              <Box className="mdq-modal-actions">
+                <Button
+                  variant="link"
+                  action="secondary"
                   type="button"
                   className="mdq-btn mdq-btn-ghost"
                   onClick={() => setShowRetakeModal(false)}
+                  onPress={() => setShowRetakeModal(false)}
                 >
-                  Cancel
-                </button>
-                <button
+                  <ButtonText>Cancel</ButtonText>
+                </Button>
+                <Button
+                  variant="outline"
+                  action="secondary"
                   type="button"
                   className="mdq-btn mdq-btn-secondary"
                   onClick={handleResetSection}
+                  onPress={handleResetSection}
                 >
-                  Reset Section
-                </button>
-                <button
+                  <ButtonText>Reset Section</ButtonText>
+                </Button>
+                <Button
+                  variant="solid"
+                  action="negative"
                   type="button"
                   className="mdq-btn mdq-btn-primary"
                   onClick={handleResetAll}
+                  onPress={handleResetAll}
                 >
-                  Reset All
-                </button>
-              </div>
-            </div>
-          </div>
+                  <ButtonText>Reset All</ButtonText>
+                </Button>
+              </Box>
+            </Box>
+          </Box>
         )}
-      </div>
+      </Box>
     </GluestackThemeProvider>
   );
 };

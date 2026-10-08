@@ -1,4 +1,5 @@
 import React from "react";
+import { Progress as GProgress, ProgressFilledTrack } from "@gluestack-ui/themed";
 
 export interface SectionProgressData {
   id: string;
@@ -33,8 +34,11 @@ export const Progress: React.FC<ProgressProps> = ({
           {currentCount} / {total} ({pct}%)
         </span>
       </div>
-      <div className="mdq-progress-bar-track">
-        <div
+      <GProgress
+        value={pct}
+        className="mdq-progress-bar-track"
+      >
+        <ProgressFilledTrack
           className="mdq-progress-bar-fill"
           style={{ width: `${pct}%` }}
           role="progressbar"
@@ -42,7 +46,7 @@ export const Progress: React.FC<ProgressProps> = ({
           aria-valuemin={0}
           aria-valuemax={100}
         />
-      </div>
+      </GProgress>
 
       {sections && sections.length > 1 && (
         <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
@@ -54,9 +58,20 @@ export const Progress: React.FC<ProgressProps> = ({
                   <span>{sec.title}</span>
                   <span>{sec.correct}/{sec.total}</span>
                 </div>
-                <div className="mdq-progress-bar-track" style={{ height: "4px" }}>
-                  <div className="mdq-progress-bar-fill" style={{ width: `${secPct}%` }} />
-                </div>
+                <GProgress
+                  value={secPct}
+                  className="mdq-progress-bar-track"
+                  style={{ height: "4px" }}
+                >
+                  <ProgressFilledTrack
+                    className="mdq-progress-bar-fill"
+                    style={{ width: `${secPct}%` }}
+                    role="progressbar"
+                    aria-valuenow={secPct}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  />
+                </GProgress>
               </div>
             );
           })}

@@ -1,4 +1,5 @@
 import React from "react";
+import { Box, Text, Button, ButtonText, HStack } from "@gluestack-ui/themed";
 import { Section } from "../parse/schema.js";
 
 export interface SectionTabsProps {
@@ -17,23 +18,28 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
   }
 
   return (
-    <nav className="mdq-section-tabs" aria-label="Sections">
-      {sections.map((section, idx) => {
-        const isActive = idx === activeIndex;
-        return (
-          <button
-            key={section.id}
-            type="button"
-            className={`mdq-tab ${isActive ? "active" : ""}`}
-            onClick={() => onSelect(idx)}
-            aria-selected={isActive}
-            role="tab"
-          >
-            {section.title}
-          </button>
-        );
-      })}
-    </nav>
+    <Box role="navigation" aria-label="Sections">
+      <HStack className="mdq-section-tabs" role="tablist">
+        {sections.map((section, idx) => {
+          const isActive = idx === activeIndex;
+          return (
+            <Button
+              key={section.id}
+              type="button"
+              variant={isActive ? "solid" : "outline"}
+              action={isActive ? "primary" : "secondary"}
+              className={`mdq-tab ${isActive ? "active" : ""}`}
+              onClick={() => onSelect(idx)}
+              onPress={() => onSelect(idx)}
+              aria-selected={isActive}
+              role="tab"
+            >
+              <ButtonText>{section.title}</ButtonText>
+            </Button>
+          );
+        })}
+      </HStack>
+    </Box>
   );
 };
 

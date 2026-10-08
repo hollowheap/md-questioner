@@ -165,12 +165,12 @@ export async function bundleStandaloneHtml(
   const inlinedData = sanitizeJson(payload);
   const pageTitle = escapeHtml(effectiveTitle);
 
-  // Replace slots
+  // Replace slots using function replacers to prevent $& / $$ / $' substitutions
   let html = template
-    .replace(/{{TITLE}}|<!-- MDQ_TITLE -->/g, pageTitle)
-    .replace(/{{CSS}}|<!-- MDQ_STYLES -->/g, inlinedCss)
-    .replace(/{{DATA}}|<!-- MDQ_DATA -->/g, inlinedData)
-    .replace(/{{JS}}|<!-- MDQ_SCRIPT -->/g, inlinedJs);
+    .replace(/{{TITLE}}|<!-- MDQ_TITLE -->/g, () => pageTitle)
+    .replace(/{{CSS}}|<!-- MDQ_STYLES -->/g, () => inlinedCss)
+    .replace(/{{DATA}}|<!-- MDQ_DATA -->/g, () => inlinedData)
+    .replace(/{{JS}}|<!-- MDQ_SCRIPT -->/g, () => inlinedJs);
 
   if (options.theme && options.theme !== "auto") {
     html = html.replace(/<html([^>]*)>/, `<html$1 data-theme="${options.theme}">`);
