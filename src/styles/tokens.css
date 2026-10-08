@@ -12,31 +12,26 @@
   --surface-elevated-white: #ffffff;
 
   /* Spacing tokens */
-  --space-4: 4px;
-  --space-8: 8px;
-  --space-12: 12px;
-  --space-16: 16px;
-  --space-20: 20px;
-  --space-24: 24px;
-  --space-28: 28px;
-  --space-32: 32px;
-  --space-40: 40px;
-  --space-64: 64px;
-  --space-80: 80px;
-  --space-96: 96px;
-  --space-124: 124px;
-  --space-128: 128px;
-  --space-160: 160px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
   --space-unit: 4px;
 
   /* Radius tokens */
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-2xl-2: 24px;
-  --radius-3xl: 28px;
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-2xl-2: 8px;
+  --radius-3xl: 8px;
   --radius-full: 9999px;
 
   /* Shadow tokens */

@@ -5,8 +5,6 @@ import {
   Heading,
   Button,
   ButtonText,
-  ButtonIcon,
-  MenuIcon,
   Card,
   ScrollView,
   HStack,
@@ -253,7 +251,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                     onPress={() => setIsDrawerOpen(true)}
                     aria-label="Open navigation menu"
                   >
-                    <ButtonIcon as={MenuIcon} size="md" />
+                    <ButtonText>Menu</ButtonText>
                   </Button>
                   <Heading size="sm">{quizModel.title}</Heading>
                 </HStack>
@@ -284,7 +282,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
               w="100%"
               mx="auto"
               px={isMobile ? "$4" : "$8"}
-              py={isMobile ? "$6" : "$8"}
+              py={isMobile ? "$6" : "$10"}
               pb={isMobile ? "$28" : "$32"}
             >
               <SectionTabs

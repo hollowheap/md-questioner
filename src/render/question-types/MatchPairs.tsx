@@ -5,15 +5,12 @@ import {
   Select,
   SelectTrigger,
   SelectInput,
-  SelectIcon,
   SelectPortal,
   SelectBackdrop,
   SelectContent,
   SelectDragIndicatorWrapper,
   SelectDragIndicator,
   SelectItem,
-  ChevronDownIcon,
-  Icon,
   HStack,
   VStack,
   Card,
@@ -99,9 +96,6 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
                   >
                     <SelectTrigger variant="outline" size="md">
                       <SelectInput placeholder="Select match..." />
-                      <SelectIcon mr="$3">
-                        <Icon as={ChevronDownIcon} />
-                      </SelectIcon>
                     </SelectTrigger>
                     <SelectPortal>
                       <SelectBackdrop />

@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
-import {
-  gluestackLightConfig,
-  gluestackDarkConfig,
-  gluestackCustomConfig,
-} from "../styles/gluestack.config.js";
+import { gluestackUIConfig } from "../styles/gluestack.config.js";
 
 export type Theme = "light" | "dark" | "auto";
 export type ResolvedTheme = "light" | "dark";
@@ -71,22 +67,20 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   const resolvedTheme: ResolvedTheme = theme === "auto" ? systemTheme : theme;
 
-  const activeConfig = resolvedTheme === "dark" ? gluestackDarkConfig : gluestackLightConfig;
-
   useEffect(() => {
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-theme", resolvedTheme);
-      document.body.style.fontFamily = activeConfig.tokens.fonts.body;
+      document.body.style.fontFamily = gluestackUIConfig.tokens.fonts.body;
       document.body.style.backgroundColor =
         resolvedTheme === "dark"
-          ? activeConfig.tokens.colors.backgroundDark950
-          : activeConfig.tokens.colors.backgroundLight0;
+          ? gluestackUIConfig.tokens.colors.backgroundDark950
+          : gluestackUIConfig.tokens.colors.backgroundLight0;
       document.body.style.color =
         resolvedTheme === "dark"
-          ? activeConfig.tokens.colors.textDark50
-          : activeConfig.tokens.colors.textLight900;
+          ? gluestackUIConfig.tokens.colors.textDark50
+          : gluestackUIConfig.tokens.colors.textLight900;
     }
-  }, [resolvedTheme, activeConfig]);
+  }, [resolvedTheme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -101,7 +95,7 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
-      <GluestackUIProvider config={activeConfig} colorMode={resolvedTheme}>
+      <GluestackUIProvider config={gluestackUIConfig} colorMode={resolvedTheme}>
         {children}
       </GluestackUIProvider>
     </ThemeContext.Provider>

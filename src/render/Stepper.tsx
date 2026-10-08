@@ -4,9 +4,6 @@ import {
   Text,
   Button,
   ButtonText,
-  ButtonIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
 } from "@gluestack-ui/themed";
 
 export interface StepperProps {
@@ -56,7 +53,6 @@ export const Stepper: React.FC<StepperProps> = ({
         isDisabled={!hasPrev}
         aria-label="Previous question"
       >
-        <ButtonIcon as={ChevronLeftIcon} mr="$1.5" />
         <ButtonText>Prev</ButtonText>
       </Button>
 
@@ -74,7 +70,6 @@ export const Stepper: React.FC<StepperProps> = ({
         aria-label="Next question"
       >
         <ButtonText>Next</ButtonText>
-        <ButtonIcon as={ChevronRightIcon} ml="$1.5" />
       </Button>
     </HStack>
   );

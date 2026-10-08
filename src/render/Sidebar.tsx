@@ -5,11 +5,6 @@ import {
   Text,
   Button,
   ButtonText,
-  ButtonIcon,
-  Icon,
-  CloseIcon,
-  CheckIcon,
-  CircleIcon,
   VStack,
   HStack,
   ScrollView,
@@ -124,9 +119,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={onClose}
                 onPress={onClose}
                 aria-label="Close navigation drawer"
-                p="$1"
               >
-                <ButtonIcon as={CloseIcon} size="md" />
+                <ButtonText>Close</ButtonText>
               </Button>
             )}
           </HStack>
@@ -178,17 +172,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
                       const ans = answeredQuestions[question.id];
 
-                      let StatusIcon = CircleIcon;
                       let statusColor = "$textLight400";
                       let statusDarkColor = "$textDark500";
 
                       if (ans) {
                         if (ans.isCorrect) {
-                          StatusIcon = CheckIcon;
                           statusColor = "$success500";
                           statusDarkColor = "$dmAccent";
                         } else {
-                          StatusIcon = CloseIcon;
                           statusColor = "$error500";
                           statusDarkColor = "$error400";
                         }
@@ -215,7 +206,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           minHeight={46}
                           borderRadius="$xl"
                         >
-                          <Icon as={StatusIcon} size="xs" mr="$2" color={statusColor} $dark-color={statusDarkColor} />
+                          <Text mr="$3" color={statusColor} $dark-color={statusDarkColor}>
+                            •
+                          </Text>
                           <ButtonText
                             numberOfLines={1}
                             color={isActive ? "$primary600" : "$textLight800"}

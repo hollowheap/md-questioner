@@ -1,63 +1,18 @@
 import { createConfig } from "@gluestack-style/react";
 import { config as defaultConfig } from "@gluestack-ui/config";
 
-const commonSpace = {
-  ...defaultConfig.tokens.space,
-  "4": 4,
-  "8": 8,
-  "12": 12,
-  "16": 16,
-  "20": 20,
-  "24": 24,
-  "28": 28,
-  "32": 32,
-  "40": 40,
-  "64": 64,
-  "80": 80,
-  "96": 96,
-  "124": 124,
-  "128": 128,
-  "160": 160,
-  unit: 4,
-};
-
 const commonRadii = {
   ...defaultConfig.tokens.radii,
-  sm: 10,
-  md: 14,
-  lg: 18,
-  xl: 20,
-  "2xl": 24,
-  "2xl-2": 24,
-  "3xl": 28,
+  none: 0,
+  xs: 2,
+  sm: 6,
+  md: 6,
+  lg: 8,
+  xl: 8,
+  "2xl": 8,
+  "2xl-2": 8,
+  "3xl": 8,
   full: 9999,
-};
-
-const commonComponents = {
-  ...defaultConfig.components,
-  Button: {
-    ...defaultConfig.components.Button,
-    theme: {
-      ...defaultConfig.components.Button.theme,
-      borderRadius: "$2xl",
-    },
-  },
-  Card: {
-    ...defaultConfig.components.Card,
-    theme: {
-      ...defaultConfig.components.Card.theme,
-      variants: {
-        ...defaultConfig.components.Card.theme.variants,
-        size: {
-          ...defaultConfig.components.Card.theme.variants.size,
-          lg: {
-            p: "$8",
-            borderRadius: "$3xl",
-          },
-        },
-      },
-    },
-  },
 };
 
 const commonFonts = {
@@ -118,9 +73,43 @@ const commonGlobalStyle = {
   },
 };
 
-export const gluestackLightConfig = createConfig({
+export const componentsConfig = {
+  ...defaultConfig.components,
+  Button: {
+    ...defaultConfig.components.Button,
+    theme: {
+      ...defaultConfig.components.Button.theme,
+      borderRadius: "$md",
+      variants: {
+        ...defaultConfig.components.Button.theme.variants,
+        action: {
+          ...defaultConfig.components.Button.theme.variants.action,
+          primary: {
+            ...defaultConfig.components.Button.theme.variants.action.primary,
+            bg: "$primary500",
+            borderColor: "$primary300",
+            _text: {
+              color: "$textLight0",
+            },
+            _dark: {
+              bg: "$primary400",
+              borderColor: "$primary400",
+              _text: {
+                color: "$textDark0",
+              },
+              ":hover": {
+                bg: "$primary300",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+export const gluestackUIConfig = createConfig({
   ...defaultConfig,
-  components: commonComponents,
   tokens: {
     ...defaultConfig.tokens,
     colors: {
@@ -129,12 +118,19 @@ export const gluestackLightConfig = createConfig({
       primary500: "#5d2a1a",
       primary600: "#4d2215",
       primary700: "#3d1b11",
-      primary400: "#753521",
+      primary400: "#7fb88a",
       primary300: "#984e36",
       primary200: "#d49a84",
       primary100: "#fbe1d1",
       primary50: "#fff5ee",
       primary0: "#ffffff",
+
+      dmAccent: "#7fb88a",
+      dmAccentSoft: "#2a3a30",
+      dmAccentInk: "#101613",
+
+      textLight0: "#ffffff",
+      textDark0: "#101613",
 
       backgroundLight0: "#ffffff",
       backgroundLight50: "#fafafb",
@@ -190,9 +186,6 @@ export const gluestackLightConfig = createConfig({
       dmTextHi: "#e8e6e1",
       dmTextMid: "#a8a29a",
       dmTextLo: "#6f6a63",
-      dmAccent: "#7fb88a",
-      dmAccentSoft: "#2a3a30",
-      dmAccentInk: "#101613",
       dmBorder: "#2e353a",
 
       // Surface tokens
@@ -202,7 +195,7 @@ export const gluestackLightConfig = createConfig({
       surfaceAccentBlush: "#fbe1d1",
       surfaceElevatedWhite: "#ffffff",
     },
-    space: commonSpace,
+    space: defaultConfig.tokens.space,
     radii: commonRadii,
     fonts: commonFonts,
     fontSizes: commonFontSizes,
@@ -210,103 +203,12 @@ export const gluestackLightConfig = createConfig({
     lineHeights: commonLineHeights,
     shadows: commonShadows,
   },
+  components: componentsConfig,
   globalStyle: commonGlobalStyle,
 });
 
-export const gluestackDarkConfig = createConfig({
-  ...defaultConfig,
-  components: commonComponents,
-  tokens: {
-    ...defaultConfig.tokens,
-    colors: {
-      ...defaultConfig.tokens.colors,
-      // AA warm green palette for dark mode
-      primary500: "#7fb88a",
-      primary400: "#7fb88a",
-      primary600: "#6fa679",
-      primary700: "#5e8e67",
-      primary300: "#9ecfa7",
-      primary200: "#bde5c4",
-      primary100: "#2a3a30",
-      primary50: "#1c2b20",
-      primary0: "#101613",
+export const gluestackLightConfig = gluestackUIConfig;
+export const gluestackDarkConfig = gluestackUIConfig;
+export const gluestackCustomConfig = gluestackUIConfig;
+export default gluestackUIConfig;
 
-      backgroundLight0: "#14181a",
-      backgroundLight50: "#1b2024",
-      backgroundLight100: "#232a2e",
-      backgroundLight200: "#2e353a",
-      backgroundLight300: "#2e353a",
-
-      backgroundDark950: "#14181a",
-      backgroundDark900: "#1b2024",
-      backgroundDark800: "#232a2e",
-      backgroundDark700: "#2e353a",
-
-      textLight950: "#e8e6e1",
-      textLight900: "#e8e6e1",
-      textLight800: "#d4d0c8",
-      textLight700: "#bcb6ac",
-      textLight600: "#a8a29a",
-      textLight500: "#a8a29a",
-      textLight400: "#8a847c",
-      textLight300: "#6f6a63",
-
-      textDark50: "#e8e6e1",
-      textDark100: "#e8e6e1",
-      textDark200: "#d4d0c8",
-      textDark300: "#bcb6ac",
-      textDark400: "#a8a29a",
-      textDark500: "#8a847c",
-      textDark600: "#6f6a63",
-
-      borderLight100: "#232a2e",
-      borderLight200: "#2e353a",
-      borderLight300: "#2e353a",
-      borderLight400: "#2e353a",
-      borderLight500: "#2e353a",
-
-      borderDark700: "#2e353a",
-      borderDark800: "#2e353a",
-      borderDark900: "#232a2e",
-
-      // Custom steep semantic tokens
-      inkBlack: "#17191c",
-      paperWhite: "#ffffff",
-      mistGray: "#f2f2f3",
-      fogWhite: "#fafafb",
-      slateGray: "#777b86",
-      ashGray: "#979799",
-      smokeGray: "#a3a6af",
-      blushPeach: "#fbe1d1",
-      siennaBrown: "#5d2a1a",
-      dmSurface0: "#14181a",
-      dmSurface1: "#1b2024",
-      dmSurface2: "#232a2e",
-      dmTextHi: "#e8e6e1",
-      dmTextMid: "#a8a29a",
-      dmTextLo: "#6f6a63",
-      dmAccent: "#7fb88a",
-      dmAccentSoft: "#2a3a30",
-      dmAccentInk: "#101613",
-      dmBorder: "#2e353a",
-
-      // Surface tokens
-      surfaceCanvas: "#14181a",
-      surfaceCardMist: "#1b2024",
-      surfaceSectionFog: "#232a2e",
-      surfaceAccentBlush: "#2a3a30",
-      surfaceElevatedWhite: "#1b2024",
-    },
-    space: commonSpace,
-    radii: commonRadii,
-    fonts: commonFonts,
-    fontSizes: commonFontSizes,
-    fontWeights: commonFontWeights,
-    lineHeights: commonLineHeights,
-    shadows: commonShadows,
-  },
-  globalStyle: commonGlobalStyle,
-});
-
-export const gluestackCustomConfig = gluestackLightConfig;
-export default gluestackCustomConfig;

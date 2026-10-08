@@ -80,7 +80,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
     <Box>
       <Box>
         <Input
-          mb="$8"
+          mb="$6"
           variant="outline"
           size="md"
           isInvalid={isLocked && !isCorrect}

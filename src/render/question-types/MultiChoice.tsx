@@ -5,9 +5,7 @@ import {
   RadioGroup,
   Radio,
   RadioIndicator,
-  RadioIcon,
   RadioLabel,
-  CircleIcon,
   Card,
   Button,
   ButtonText,
@@ -59,14 +57,20 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
           {options.map((opt) => {
             const isSelected = selectedId === opt.id;
             let borderColor = isSelected ? "$primary500" : "$borderLight200";
+            let darkBorderColor = isSelected ? "$primary400" : "$borderDark700";
             let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
+            let darkBgColor = isSelected ? "$dmAccentSoft" : "$backgroundDark900";
             if (isLocked) {
               if (opt.isCorrect) {
                 borderColor = "$success500";
+                darkBorderColor = "$dmAccent";
                 bgColor = "$primary100";
+                darkBgColor = "$dmAccentSoft";
               } else if (isSelected && !opt.isCorrect) {
                 borderColor = "$error500";
+                darkBorderColor = "$error400";
                 bgColor = "$backgroundLight100";
+                darkBgColor = "$backgroundDark800";
               }
             }
             return (
@@ -79,17 +83,16 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
                 px="$6"
                 py="$4"
                 minHeight={62}
-                borderRadius="$2xl"
+                borderRadius="$md"
                 borderWidth={1}
                 borderColor={borderColor}
+                $dark-borderColor={darkBorderColor}
                 bg={bgColor}
-                $dark-bg={isSelected ? "$dmAccentSoft" : "$backgroundDark900"}
+                $dark-bg={darkBgColor}
                 justifyContent="flex-start"
                 alignItems="center"
               >
-                <RadioIndicator mr="$4">
-                  <RadioIcon as={CircleIcon} />
-                </RadioIndicator>
+                <RadioIndicator mr="$3" />
                 <RadioLabel
                   flex={1}
                   fontWeight={isSelected ? "$semibold" : "$normal"}

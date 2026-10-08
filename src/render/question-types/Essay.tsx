@@ -17,9 +17,7 @@ import {
   HStack,
   Checkbox,
   CheckboxIndicator,
-  CheckboxIcon,
   CheckboxLabel,
-  CheckIcon,
 } from "@gluestack-ui/themed";
 
 export interface EssayProps {
@@ -234,9 +232,7 @@ export const Essay: React.FC<EssayProps> = ({
                     py="$3"
                     px="$4"
                   >
-                    <CheckboxIndicator mr="$3">
-                      <CheckboxIcon as={CheckIcon} />
-                    </CheckboxIndicator>
+                    <CheckboxIndicator mr="$3" />
                     <CheckboxLabel size="sm">
                       {criterion}
                     </CheckboxLabel>
