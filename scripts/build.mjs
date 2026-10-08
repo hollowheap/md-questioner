@@ -31,14 +31,14 @@ async function build() {
     setup(build) {
       build.onLoad({ filter: /forwardedProps[/\\]index\.js$/ }, async (args) => {
         let src = await fs.readFile(args.path, "utf8");
-        src = src.replace("children: true,", "children: true,\n  className: true,");
+        src = src.replace("children: true,", "children: true,\n  className: true,\n  dangerouslySetInnerHTML: true,");
         return { contents: src, loader: "js" };
       });
       build.onLoad({ filter: /createDOMProps[/\\]index\.js$/ }, async (args) => {
         let src = await fs.readFile(args.path, "utf8");
         src = src.replace(
           "if (className) {\n    domProps.className = className;\n  }",
-          "if (className) {\n    domProps.className = (props && props.className) ? className + \" \" + props.className : className;\n  } else if (props && props.className) {\n    domProps.className = props.className;\n  }"
+          "if (className) {\n    domProps.className = (props && props.className) ? className + \" \" + props.className : className;\n  } else if (props && props.className) {\n    domProps.className = props.className;\n  }\n  if (props && props.dangerouslySetInnerHTML) {\n    domProps.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML;\n  }"
         );
         return { contents: src, loader: "js" };
       });

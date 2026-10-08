@@ -4,7 +4,6 @@ import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseMarkdown, validateQuizModel } from "../dist/scripts/md-questioner.mjs";
-import { runHeadlessVerification } from "../dist/verify/headless.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +25,8 @@ async function verifyAll() {
   if (buildRes.status !== 0) {
     throw new Error("scripts/build.mjs failed");
   }
+
+  const { runHeadlessVerification } = await import("../dist/verify/headless.js");
 
   const outDir = path.resolve(rootDir, "out/verification");
   await fs.mkdir(outDir, { recursive: true });
@@ -141,6 +142,9 @@ async function verifyAll() {
       } else if (res.checkName.includes("Theme Toggle")) {
         checkId = 7;
         checkName = "Dark mode toggle (data-theme flip & accent change)";
+      } else if (res.checkName.includes("Code Block") || res.checkName.includes("Markdown")) {
+        checkId = 2;
+        checkName = "Prose, code block, explanation & model answer rendering";
       }
 
       reports.push({
@@ -239,9 +243,9 @@ ${reports
 ${reports.find((r) => r.id === 1)?.output || "N/A"}
 \`\`\`
 
-### 2. Render Smoke Test
+### 2. Render Smoke Test & Content Rendering
 \`\`\`
-${reports.find((r) => r.id === 2)?.output || "N/A"}
+${reports.filter((r) => r.id === 2).map((r) => r.output).join("\n") || "N/A"}
 \`\`\`
 
 ### 3. Offline Check & Hydration

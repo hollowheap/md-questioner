@@ -149,6 +149,7 @@ export async function runHeadlessVerification(
       "React Hydration",
       "Serif Style Application",
       "Theme Toggle Functionality",
+      "Code Block and Markdown Content Rendering",
       "Mobile Viewport and Drawer",
     ];
     for (const check of remainingChecks) {
@@ -178,6 +179,10 @@ export async function runHeadlessVerification(
   };
   const themeToggleCheck: VerificationCheckResult = {
     checkName: "Theme Toggle Functionality",
+    passed: false,
+  };
+  const proseAndCodeCheck: VerificationCheckResult = {
+    checkName: "Code Block and Markdown Content Rendering",
     passed: false,
   };
   const mobileViewportCheck: VerificationCheckResult = {
@@ -316,7 +321,78 @@ export async function runHeadlessVerification(
     }
     results.push(themeToggleCheck);
 
-    // Check 6: Mobile viewport - Viewport { width: 375, height: 667 }; assert stepper is visible and desktop sidebar collapses to drawer
+    // Check 6: Prose & Code block rendering (code blocks, explanations, model answers)
+    try {
+      // 1. Explanation verification:
+      const optionParis = page.locator('text="Paris"').first();
+      await optionParis.waitFor({ state: "visible", timeout: 4000 });
+      await optionParis.click();
+      const checkBtn = page.locator('button:has-text("Check Answer")').first();
+      await checkBtn.waitFor({ state: "visible", timeout: 4000 });
+      await checkBtn.click();
+      await page.waitForTimeout(100);
+
+      const explanationLocator = page.locator('text="Paris is the capital and largest city of France."').first();
+      await explanationLocator.waitFor({ state: "visible", timeout: 4000 });
+      const hasExplanation = await explanationLocator.isVisible();
+      if (!hasExplanation) {
+        throw new Error("Explanation text was not rendered into DOM after checking answer");
+      }
+
+      // 2. Code block verification (pre code.hljs):
+      const betaTab = page.locator(':is(button, [role="tab"]):has-text("Section Beta")').first();
+      await betaTab.waitFor({ state: "visible", timeout: 4000 });
+      await betaTab.click();
+      await page.waitForTimeout(100);
+
+      const q3Nav = page.locator('button:has-text("What does this TypeScript function return?")').first();
+      await q3Nav.waitFor({ state: "visible", timeout: 4000 });
+      await q3Nav.click();
+      await page.waitForTimeout(100);
+
+      const codeBlockLocator = page.locator("pre code.hljs").first();
+      await codeBlockLocator.waitFor({ state: "visible", timeout: 4000 });
+      const hasCodeBlock = await codeBlockLocator.isVisible();
+      const codeBlockContent = await codeBlockLocator.textContent();
+      if (!hasCodeBlock || !codeBlockContent || !codeBlockContent.includes("function add")) {
+        throw new Error("Code block (pre code.hljs) was not rendered into DOM with expected content");
+      }
+
+      // Also verify question explanation is rendered
+      const notesElem = page.locator('text="Explain why the return type is explicitly annotated."').first();
+      await notesElem.waitFor({ state: "visible", timeout: 4000 });
+
+      // 3. Model answer verification:
+      const q4Nav = page.locator('button:has-text("Explain the trade-offs of database indexing")').first();
+      await q4Nav.waitFor({ state: "visible", timeout: 4000 });
+      await q4Nav.click();
+      await page.waitForTimeout(100);
+
+      const essayTextarea = page.locator("textarea").first();
+      await essayTextarea.waitFor({ state: "visible", timeout: 4000 });
+      await essayTextarea.fill("Database indexing uses B-tree structures to reduce disk I/O operations.");
+
+      const reviewBtn = page.locator('button:has-text("Check & Review")').first();
+      await reviewBtn.waitFor({ state: "visible", timeout: 4000 });
+      await reviewBtn.click();
+      await page.waitForTimeout(100);
+
+      const modelAnswerLocator = page.getByText("Database indexes commonly utilize B-tree").first();
+      await modelAnswerLocator.waitFor({ state: "visible", timeout: 4000 });
+      const hasModelAnswer = await modelAnswerLocator.isVisible();
+      if (!hasModelAnswer) {
+        throw new Error("Model answer was not rendered into DOM after submitting essay");
+      }
+
+      proseAndCodeCheck.passed = true;
+      proseAndCodeCheck.details = "Code blocks (pre code.hljs), explanations, and model answers are rendered in the DOM";
+    } catch (err: any) {
+      proseAndCodeCheck.passed = false;
+      proseAndCodeCheck.details = `Error verifying prose and code rendering: ${err.message || String(err)}`;
+    }
+    results.push(proseAndCodeCheck);
+
+    // Check 7: Mobile viewport - Viewport { width: 375, height: 667 }; assert stepper is visible and desktop sidebar collapses to drawer
     try {
       await page.setViewportSize({ width: 375, height: 667 });
       await page.waitForTimeout(100);
@@ -392,6 +468,7 @@ export async function runHeadlessVerification(
       hydrationCheck,
       styleCheck,
       themeToggleCheck,
+      proseAndCodeCheck,
       mobileViewportCheck,
     ];
     for (const check of pendingChecks) {

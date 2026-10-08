@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Question } from "../../parse/schema.js";
 import { highlightMatchedWords, matchConcepts } from "../nlp/conceptMatcher.js";
+import { MarkdownView } from "../MarkdownView.js";
 import {
   Textarea,
   TextareaInput,
@@ -207,9 +208,7 @@ export const Essay: React.FC<EssayProps> = ({
             {question.modelAnswerHtml && (
               <Card variant="outline" p="$5" borderRadius="$xl">
                 <Heading size="xs" mb="$2">MODEL ANSWER</Heading>
-                <Box
-                  dangerouslySetInnerHTML={{ __html: question.modelAnswerHtml }}
-                />
+                <MarkdownView html={question.modelAnswerHtml} />
               </Card>
             )}
           </VStack>
@@ -265,9 +264,7 @@ export const Essay: React.FC<EssayProps> = ({
           {question.explanationHtml && (
             <Card variant="outline" mt="$5" p="$5">
               <Heading size="sm" mb="$2">Notes & Key Takeaways</Heading>
-              <Box
-                dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
-              />
+              <MarkdownView html={question.explanationHtml} />
             </Card>
           )}
         </Box>

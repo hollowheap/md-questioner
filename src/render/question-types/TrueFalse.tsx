@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
+import { MarkdownView } from "../MarkdownView.js";
 import {
   Box,
   Text,
@@ -107,9 +108,7 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
       {isLocked && question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
-          <Box
-            dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
-          />
+          <MarkdownView html={question.explanationHtml} />
         </Card>
       )}
     </Box>

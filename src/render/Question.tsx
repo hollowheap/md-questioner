@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Heading, Text, Card } from "@gluestack-ui/themed";
 import { Question as QuestionData } from "../parse/schema.js";
 import { Hint } from "./Hint.js";
+import { MarkdownView } from "./MarkdownView.js";
 import { MultiChoice } from "./question-types/MultiChoice.js";
 import { MultiSelect } from "./question-types/MultiSelect.js";
 import { TrueFalse } from "./question-types/TrueFalse.js";
@@ -110,10 +111,9 @@ export const Question: React.FC<QuestionProps> = ({
       <Heading size="md" mb="$4">{question.title}</Heading>
 
       {question.promptHtml && (
-        <Box
-          mb="$6"
-          dangerouslySetInnerHTML={{ __html: question.promptHtml }}
-        />
+        <Box mb="$6">
+          <MarkdownView html={question.promptHtml} />
+        </Box>
       )}
 
       {question.hint && (

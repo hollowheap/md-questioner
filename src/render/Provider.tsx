@@ -71,11 +71,22 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   const resolvedTheme: ResolvedTheme = theme === "auto" ? systemTheme : theme;
 
+  const activeConfig = resolvedTheme === "dark" ? gluestackDarkConfig : gluestackLightConfig;
+
   useEffect(() => {
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-theme", resolvedTheme);
+      document.body.style.fontFamily = activeConfig.tokens.fonts.body;
+      document.body.style.backgroundColor =
+        resolvedTheme === "dark"
+          ? activeConfig.tokens.colors.backgroundDark950
+          : activeConfig.tokens.colors.backgroundLight0;
+      document.body.style.color =
+        resolvedTheme === "dark"
+          ? activeConfig.tokens.colors.textDark50
+          : activeConfig.tokens.colors.textLight900;
     }
-  }, [resolvedTheme]);
+  }, [resolvedTheme, activeConfig]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -87,8 +98,6 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
       }
     }
   };
-
-  const activeConfig = resolvedTheme === "dark" ? gluestackDarkConfig : gluestackLightConfig;
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>

@@ -18,6 +18,7 @@ const commonSpace = {
   "124": 124,
   "128": 128,
   "160": 160,
+  unit: 4,
 };
 
 const commonRadii = {
@@ -34,6 +35,57 @@ const commonFonts = {
   heading: '"Signifier", "Iowan Old Style", "Charter", "Source Serif 4", Georgia, serif',
   body: '"Signifier", "Iowan Old Style", "Charter", "Source Serif 4", Georgia, serif',
   mono: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+};
+
+const commonFontSizes = {
+  ...defaultConfig.tokens.fontSizes,
+  sm: 14,
+  base: 15,
+  lg: 17,
+  xl: 20,
+  "2xl": 26,
+  "4xl": 44,
+  "5xl": 64,
+};
+
+const commonFontWeights = {
+  ...defaultConfig.tokens.fontWeights,
+  "400": "400",
+  "430": "430",
+  "450": "450",
+  "480": "480",
+  "500": "500",
+  semibold: "600",
+};
+
+const commonLineHeights = {
+  ...defaultConfig.tokens.lineHeights,
+  sm: 20,
+  base: 22.5,
+  lg: 21.25,
+  xl: 27,
+  "2xl": 30.7,
+  "4xl": 57.2,
+  "5xl": 83.2,
+};
+
+const commonShadows = {
+  subtle: "oklab(0 0 0 / 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.08) 0px 4px 24px 0px",
+  "subtle-2": "oklab(0 0 0 / 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 8px 40px 0px",
+  "subtle-3": "rgba(4, 23, 43, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px",
+};
+
+const commonGlobalStyle = {
+  ...defaultConfig.globalStyle,
+  body: {
+    fontFamily: "$body",
+    color: "$textLight900",
+    backgroundColor: "$backgroundLight0",
+    _dark: {
+      color: "$textDark50",
+      backgroundColor: "$backgroundDark950",
+    },
+  },
 };
 
 export const gluestackLightConfig = createConfig({
@@ -122,7 +174,12 @@ export const gluestackLightConfig = createConfig({
     space: commonSpace,
     radii: commonRadii,
     fonts: commonFonts,
+    fontSizes: commonFontSizes,
+    fontWeights: commonFontWeights,
+    lineHeights: commonLineHeights,
+    shadows: commonShadows,
   },
+  globalStyle: commonGlobalStyle,
 });
 
 export const gluestackDarkConfig = createConfig({
@@ -211,7 +268,12 @@ export const gluestackDarkConfig = createConfig({
     space: commonSpace,
     radii: commonRadii,
     fonts: commonFonts,
+    fontSizes: commonFontSizes,
+    fontWeights: commonFontWeights,
+    lineHeights: commonLineHeights,
+    shadows: commonShadows,
   },
+  globalStyle: commonGlobalStyle,
 });
 
 export const gluestackCustomConfig = gluestackLightConfig;
