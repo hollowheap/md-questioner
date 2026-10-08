@@ -78,11 +78,14 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
 
   return (
     <Box>
-      <Box mb="$5">
+      <Box>
         <Input
-          mb="$3"
+          mb="$8"
           variant="outline"
           size="md"
+          minHeight={58}
+          px="$5"
+          borderRadius="$2xl"
           isInvalid={isLocked && !isCorrect}
           isDisabled={isLocked || disabled}
         >
@@ -97,7 +100,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
           />
         </Input>
         {isLocked && !isCorrect && canonical && (
-          <Text size="sm" color="$error500" $dark-color="$error400">
+          <Text size="sm" color="$error500" $dark-color="$error400" mb="$6">
             Expected: {canonical}
           </Text>
         )}
@@ -108,6 +111,8 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
           size="md"
           variant="solid"
           action="primary"
+          px="$6"
+          py="$3.5"
           onClick={handleSubmit}
           onPress={handleSubmit}
           isDisabled={!value.trim() || disabled}

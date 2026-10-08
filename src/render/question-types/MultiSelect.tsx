@@ -63,7 +63,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
   return (
     <Box>
-      <CheckboxGroup value={selectedIds} onChange={setSelectedIds} isDisabled={isLocked || disabled} mb="$6">
+      <CheckboxGroup value={selectedIds} onChange={setSelectedIds} isDisabled={isLocked || disabled} mb="$8">
         <VStack space="md">
           {options.map((opt) => {
             const isSelected = selectedIds.includes(opt.id);
@@ -81,30 +81,36 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
             }
 
             return (
-              <Card
+              <Checkbox
                 key={opt.id}
-                variant="outline"
-                p="$4"
-                borderRadius="$xl"
+                value={opt.id}
+                size="md"
+                isChecked={isSelected}
+                onChange={() => handleToggle(opt.id)}
+                isDisabled={isLocked || disabled}
+                w="100%"
+                px="$6"
+                py="$4"
+                minHeight={62}
+                borderRadius="$2xl"
+                borderWidth={1}
                 borderColor={borderColor}
                 bg={bgColor}
                 $dark-bg={isSelected ? "$dmAccentSoft" : "$backgroundDark900"}
+                justifyContent="flex-start"
+                alignItems="center"
               >
-                <Checkbox
-                  value={opt.id}
+                <CheckboxIndicator mr="$4">
+                  <CheckboxIcon as={CheckIcon} />
+                </CheckboxIndicator>
+                <CheckboxLabel
+                  flex={1}
+                  fontWeight={isSelected ? "$semibold" : "$normal"}
                   size="md"
-                  isChecked={isSelected}
-                  onChange={() => handleToggle(opt.id)}
-                  isDisabled={isLocked || disabled}
                 >
-                  <CheckboxIndicator mr="$3">
-                    <CheckboxIcon as={CheckIcon} />
-                  </CheckboxIndicator>
-                  <CheckboxLabel fontWeight={isSelected ? "$semibold" : "$normal"}>
-                    {opt.text}
-                  </CheckboxLabel>
-                </Checkbox>
-              </Card>
+                  {opt.text}
+                </CheckboxLabel>
+              </Checkbox>
             );
           })}
         </VStack>
@@ -115,6 +121,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           size="md"
           variant="solid"
           action="primary"
+          px="$6"
+          py="$3.5"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={selectedIds.length === 0 || disabled}

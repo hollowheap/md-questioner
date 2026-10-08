@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         role="complementary"
       >
         <Box
-          p="$5"
+          p="$6"
           borderBottomWidth={1}
           borderColor="$borderLight200"
           $dark-borderColor="$borderDark700"
@@ -152,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     mb="$1"
                   >
                     <Text
-                      size="xs"
+                      size="sm"
                       fontWeight="$semibold"
                       textTransform="uppercase"
                       color="$textLight500"
@@ -161,14 +161,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       {section.title}
                     </Text>
                     <Text
-                      size="xs"
+                      size="sm"
                       color="$textLight500"
                       $dark-color="$textDark400"
                     >
                       {secProgress.correct} / {secProgress.total}
                     </Text>
                   </HStack>
-                  <VStack space="xs">
+                  <VStack space="sm">
                     {section.questions.map((question, qIdx) => {
                       const isActive =
                         sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
@@ -206,10 +206,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           bg={isActive ? "$primary100" : "transparent"}
                           $dark-bg={isActive ? "$dmAccentSoft" : "transparent"}
                           justifyContent="flex-start"
-                          px="$3"
-                          py="$2.5"
-                          minHeight={40}
-                          borderRadius="$md"
+                          px="$4"
+                          py="$3"
+                          minHeight={46}
+                          borderRadius="$xl"
                         >
                           <Text mr="$2" color={statusColor} $dark-color={statusDarkColor}>
                             {statusIcon}
@@ -233,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ScrollView>
 
         <Box
-          p="$5"
+          p="$6"
           borderTopWidth={1}
           borderColor="$borderLight200"
           $dark-borderColor="$borderDark700"

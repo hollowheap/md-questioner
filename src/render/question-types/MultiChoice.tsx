@@ -54,7 +54,7 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
 
   return (
     <Box>
-      <RadioGroup value={selectedId} onChange={handleSelect} isDisabled={isLocked || disabled} mb="$6">
+      <RadioGroup value={selectedId} onChange={handleSelect} isDisabled={isLocked || disabled} mb="$8">
         <VStack space="md">
           {options.map((opt) => {
             const isSelected = selectedId === opt.id;
@@ -70,24 +70,34 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
               }
             }
             return (
-              <Card
+              <Radio
                 key={opt.id}
-                variant="outline"
-                p="$4"
-                borderRadius="$xl"
+                value={opt.id}
+                size="md"
+                isDisabled={isLocked || disabled}
+                w="100%"
+                px="$6"
+                py="$4"
+                minHeight={62}
+                borderRadius="$2xl"
+                borderWidth={1}
                 borderColor={borderColor}
                 bg={bgColor}
                 $dark-bg={isSelected ? "$dmAccentSoft" : "$backgroundDark900"}
+                justifyContent="flex-start"
+                alignItems="center"
               >
-                <Radio value={opt.id} size="md" isDisabled={isLocked || disabled}>
-                  <RadioIndicator mr="$3">
-                    <RadioIcon as={CircleIcon} />
-                  </RadioIndicator>
-                  <RadioLabel fontWeight={isSelected ? "$semibold" : "$normal"}>
-                    {opt.text}
-                  </RadioLabel>
-                </Radio>
-              </Card>
+                <RadioIndicator mr="$4">
+                  <RadioIcon as={CircleIcon} />
+                </RadioIndicator>
+                <RadioLabel
+                  flex={1}
+                  fontWeight={isSelected ? "$semibold" : "$normal"}
+                  size="md"
+                >
+                  {opt.text}
+                </RadioLabel>
+              </Radio>
             );
           })}
         </VStack>
@@ -98,6 +108,8 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
           size="md"
           variant="solid"
           action="primary"
+          px="$6"
+          py="$3.5"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={!selectedId || disabled}

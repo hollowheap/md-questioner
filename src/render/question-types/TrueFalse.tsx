@@ -71,9 +71,10 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
         key={opt.id}
         size="lg"
         flex={1}
-        minHeight={52}
-        p="$3"
-        borderRadius="$xl"
+        minHeight={66}
+        py="$4"
+        px="$6"
+        borderRadius="$2xl"
         variant={isSelected || (isLocked && opt.isCorrect) ? "solid" : "outline"}
         action={action}
         isDisabled={isLocked || disabled}
@@ -87,7 +88,7 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 
   return (
     <Box>
-      <HStack space="md" mb="$6">
+      <HStack space="lg" mb="$8">
         {renderButton(trueOption, "True")}
         {renderButton(falseOption, "False")}
       </HStack>
@@ -97,6 +98,8 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
           size="md"
           variant="solid"
           action="primary"
+          px="$6"
+          py="$3.5"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={!selectedId || disabled}

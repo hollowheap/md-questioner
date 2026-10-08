@@ -155,7 +155,7 @@ export const Essay: React.FC<EssayProps> = ({
           </Box>
 
           <HStack mt="$3" mb="$5" justifyContent="space-between" alignItems="center" flexWrap="wrap" space="md">
-            <Text size="xs" color="$textLight500" $dark-color="$textDark400">
+            <Text size="sm" color="$textLight500" $dark-color="$textDark400">
               {wordCount} {wordCount === 1 ? "word" : "words"} • {charCount} {charCount === 1 ? "character" : "characters"}
             </Text>
 
@@ -191,7 +191,7 @@ export const Essay: React.FC<EssayProps> = ({
 
           <VStack space="md" mb="$4">
             <Card variant="outline" p="$5" borderRadius="$xl">
-              <Heading size="xs" mb="$2">YOUR SUBMISSION</Heading>
+              <Heading size="sm" mb="$2">YOUR SUBMISSION</Heading>
               <Box>
                 {submissionSegments.map((segment, idx) =>
                   segment.isMatched ? (
@@ -207,7 +207,7 @@ export const Essay: React.FC<EssayProps> = ({
 
             {question.modelAnswerHtml && (
               <Card variant="outline" p="$5" borderRadius="$xl">
-                <Heading size="xs" mb="$2">MODEL ANSWER</Heading>
+                <Heading size="sm" mb="$2">MODEL ANSWER</Heading>
                 <MarkdownView html={question.modelAnswerHtml} />
               </Card>
             )}
@@ -231,6 +231,8 @@ export const Essay: React.FC<EssayProps> = ({
                     isChecked={Boolean(checkedRubric[idx])}
                     onChange={() => handleToggleCriterion(idx)}
                     isDisabled={disabled}
+                    py="$3"
+                    px="$4"
                   >
                     <CheckboxIndicator mr="$3">
                       <CheckboxIcon as={CheckIcon} />

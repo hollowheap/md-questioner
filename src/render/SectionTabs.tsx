@@ -19,13 +19,17 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
 
   return (
     <Box role="navigation" aria-label="Sections">
-      <HStack space="sm" mb="$6" role="tablist">
+      <HStack space="md" mb="$8" role="tablist">
         {sections.map((section, idx) => {
           const isActive = idx === activeIndex;
           return (
             <Button
               key={section.id}
               type="button"
+              size="md"
+              px="$5"
+              py="$3"
+              borderRadius="$xl"
               variant={isActive ? "solid" : "outline"}
               action={isActive ? "primary" : "secondary"}
               onClick={() => onSelect(idx)}

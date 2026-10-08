@@ -29,8 +29,8 @@ export const Stepper: React.FC<StepperProps> = ({
       zIndex={90}
       justifyContent="space-between"
       alignItems="center"
-      px="$6"
-      py="$4"
+      px="$8"
+      py="$5"
       borderTopWidth={1}
       borderColor="$borderLight200"
       $dark-borderColor="$borderDark700"
@@ -40,6 +40,10 @@ export const Stepper: React.FC<StepperProps> = ({
       role="contentinfo"
     >
       <Button
+        size="md"
+        px="$5"
+        py="$3"
+        borderRadius="$xl"
         variant="outline"
         action="secondary"
         onClick={onPrev}
@@ -50,11 +54,15 @@ export const Stepper: React.FC<StepperProps> = ({
         <ButtonText>‹ Prev</ButtonText>
       </Button>
 
-      <Text fontWeight="$medium">
+      <Text size="md" fontWeight="$medium">
         Q {current + 1} / {total}
       </Text>
 
       <Button
+        size="md"
+        px="$5"
+        py="$3"
+        borderRadius="$xl"
         variant="solid"
         action="primary"
         onClick={onNext}

@@ -34,12 +34,12 @@ export const Progress: React.FC<ProgressProps> = ({
   const pct = total > 0 ? Math.min(100, Math.round((currentCount / total) * 100)) : 0;
 
   return (
-    <VStack space="xs">
+    <VStack space="sm">
       <HStack justifyContent="space-between" alignItems="center" mb="$1">
-        <Text size="xs" fontWeight="$medium" color="$textLight700" $dark-color="$textDark300">
+        <Text size="sm" fontWeight="$medium" color="$textLight700" $dark-color="$textDark300">
           {label}
         </Text>
-        <Text size="xs" color="$textLight500" $dark-color="$textDark400">
+        <Text size="sm" color="$textLight500" $dark-color="$textDark400">
           {currentCount} / {total} ({pct}%)
         </Text>
       </HStack>
@@ -53,20 +53,20 @@ export const Progress: React.FC<ProgressProps> = ({
       </GProgress>
 
       {sections && sections.length > 1 && (
-        <VStack space="xs" mt="$3">
+        <VStack space="sm" mt="$4">
           {sections.map((sec) => {
             const secPct = sec.total > 0 ? Math.round((sec.correct / sec.total) * 100) : 0;
             return (
               <Box key={sec.id}>
                 <HStack justifyContent="space-between" mb="$1">
-                  <Text size="2xs" color="$textLight500" $dark-color="$textDark400">
+                  <Text size="sm" color="$textLight500" $dark-color="$textDark400">
                     {sec.title}
                   </Text>
-                  <Text size="2xs" color="$textLight500" $dark-color="$textDark400">
+                  <Text size="sm" color="$textLight500" $dark-color="$textDark400">
                     {sec.correct}/{sec.total}
                   </Text>
                 </HStack>
-                <GProgress value={secPct} size="xs">
+                <GProgress value={secPct} size="sm">
                   <ProgressFilledTrack
                     role="progressbar"
                     aria-valuenow={secPct}

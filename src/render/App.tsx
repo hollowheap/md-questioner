@@ -232,28 +232,38 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           <HStack
             justifyContent="space-between"
             alignItems="center"
-            p="$4"
+            px={isMobile ? "$6" : "$8"}
+            py={isMobile ? "$4" : "$5"}
             borderBottomWidth={1}
             borderColor="$borderLight200"
             $dark-borderColor="$borderDark700"
             bg="$backgroundLight0"
             $dark-bg="$backgroundDark900"
           >
-            <HStack space="md" alignItems="center">
-              <Button
-                data-testid="mdq-menu-toggle"
-                testID="mdq-menu-toggle"
-                variant="outline"
-                action="secondary"
-                display={isMobile ? "flex" : "none"}
-                onClick={() => setIsDrawerOpen(true)}
-                onPress={() => setIsDrawerOpen(true)}
-                aria-label="Open navigation menu"
-              >
-                <ButtonText>☰</ButtonText>
-              </Button>
-              <Heading size="sm">{quizModel.title}</Heading>
-            </HStack>
+            {isMobile ? (
+              <HStack space="md" alignItems="center">
+                <Button
+                  data-testid="mdq-menu-toggle"
+                  testID="mdq-menu-toggle"
+                  variant="outline"
+                  action="secondary"
+                  onClick={() => setIsDrawerOpen(true)}
+                  onPress={() => setIsDrawerOpen(true)}
+                  aria-label="Open navigation menu"
+                >
+                  <ButtonText>☰</ButtonText>
+                </Button>
+                <Heading size="sm">{quizModel.title}</Heading>
+              </HStack>
+            ) : (
+              <HStack space="sm" alignItems="center">
+                <Text size="sm" fontWeight="$semibold">{currentSection.title}</Text>
+                <Text size="sm" color="$textLight400">•</Text>
+                <Text size="sm" color="$textLight600" $dark-color="$textDark400">
+                  Question {activeQuestionIndex + 1} of {displayedQuestions.length}
+                </Text>
+              </HStack>
+            )}
 
             <Shuffle
               isShuffled={isShuffled}
@@ -266,7 +276,14 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           </HStack>
 
           <ScrollView flex={1}>
-            <Box maxW={820} w="100%" mx="auto" px="$6" py="$8">
+            <Box
+              maxW={780}
+              w="100%"
+              mx="auto"
+              px={isMobile ? "$5" : "$8"}
+              py={isMobile ? "$6" : "$10"}
+              pb={isMobile ? "$28" : "$32"}
+            >
               <SectionTabs
                 sections={quizModel.sections}
                 activeIndex={activeSectionIndex}

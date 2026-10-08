@@ -25,7 +25,10 @@ export const Shuffle: React.FC<ShuffleProps> = ({
 
   return (
     <Button
-      size="sm"
+      size="md"
+      px="$4"
+      py="$2"
+      borderRadius="$xl"
       variant={isShuffled ? "solid" : "outline"}
       action={isShuffled ? "primary" : "secondary"}
       type="button"

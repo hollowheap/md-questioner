@@ -88,7 +88,7 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
           const isRowIncorrect = isLocked && selectedAnswer !== pair.answer;
 
           return (
-            <Card key={pair.prompt} variant="outline" p="$4" mb="$3" borderRadius="$xl">
+            <Card key={pair.prompt} variant="outline" p="$5" mb="$4" borderRadius="$2xl">
               <HStack justifyContent="space-between" alignItems="center" space="md">
                 <Text flex={1} fontWeight="$medium">{pair.prompt}</Text>
                 <Box flex={1} maxW={280}>
@@ -116,7 +116,7 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
                     </SelectPortal>
                   </Select>
                   {isRowIncorrect && (
-                    <Text size="xs" color="$error500" mt="$1">
+                    <Text size="sm" color="$error500" mt="$1">
                       Correct: {pair.answer}
                     </Text>
                   )}
