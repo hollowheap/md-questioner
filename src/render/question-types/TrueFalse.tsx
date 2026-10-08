@@ -55,13 +55,13 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
   const renderButton = (opt: typeof trueOption, label: string) => {
     if (!opt) return null;
     const isSelected = selectedId === opt.id;
-    let statusClass = "";
+    let action: "primary" | "secondary" | "positive" | "negative" = isSelected ? "primary" : "secondary";
 
     if (isLocked) {
       if (opt.isCorrect) {
-        statusClass = "is-correct";
+        action = "positive";
       } else if (isSelected && !opt.isCorrect) {
-        statusClass = "is-incorrect";
+        action = "negative";
       }
     }
 
@@ -72,21 +72,20 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
         minHeight={52}
         p="$3"
         borderRadius="$xl"
-        variant={isSelected ? "solid" : "outline"}
-        action={isSelected ? "primary" : "secondary"}
-        className={`mdq-tf-btn ${isSelected ? "selected" : ""} ${statusClass}`}
+        variant={isSelected || (isLocked && opt.isCorrect) ? "solid" : "outline"}
+        action={action}
         isDisabled={isLocked || disabled}
         onClick={() => handleSelect(opt.id)}
         onPress={() => handleSelect(opt.id)}
       >
-        <ButtonText style={{ color: "inherit" }}>{label}</ButtonText>
+        <ButtonText>{label}</ButtonText>
       </Button>
     );
   };
 
   return (
-    <Box className="mdq-true-false">
-      <HStack space="md" mb="$5" className="mdq-tf-group">
+    <Box>
+      <HStack space="md" mb="$5">
         {renderButton(trueOption, "True")}
         {renderButton(falseOption, "False")}
       </HStack>
@@ -96,7 +95,6 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
           mt="$2"
           variant="solid"
           action="primary"
-          className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={!selectedId || disabled}
@@ -108,8 +106,7 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
       {isLocked && question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
-          <div
-            className="mdq-explanation-body"
+          <Box
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
         </Card>

@@ -41,9 +41,9 @@ export const Reflection: React.FC<ReflectionProps> = ({
   };
 
   return (
-    <Box className="mdq-reflection">
-      <Box mb="$5" className="mdq-reflection-group">
-        <Textarea mb="$3" size="md" className="mdq-reflection-textarea" isDisabled={disabled}>
+    <Box>
+      <Box mb="$5">
+        <Textarea mb="$3" size="md" isDisabled={disabled}>
           <TextareaInput
             placeholder="Reflect on this question, write down your reasoning, or take study notes..."
             value={text}
@@ -58,8 +58,7 @@ export const Reflection: React.FC<ReflectionProps> = ({
       {question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Suggested Notes & Key Takeaways</Heading>
-          <div
-            className="mdq-explanation-body"
+          <Box
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
         </Card>

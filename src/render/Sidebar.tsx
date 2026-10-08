@@ -38,6 +38,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelect,
   onRetake,
 }) => {
+  const [isMobile, setIsMobile] = React.useState<boolean>(() => {
+    if (typeof window !== "undefined") return window.innerWidth < 1024;
+    return false;
+  });
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+
   let totalQuestions = 0;
   let totalCorrect = 0;
 
@@ -60,13 +70,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
+      {isMobile && isOpen && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="rgba(0, 0, 0, 0.45)"
+          zIndex={999}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
       <Box
-        className={`mdq-overlay ${isOpen ? "open" : ""}`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <Box
-        className={`mdq-sidebar ${isOpen ? "open" : ""}`}
+        data-testid="mdq-sidebar"
+        testID="mdq-sidebar"
+        position={isMobile ? "fixed" : "sticky"}
+        top={0}
+        {...(isMobile
+          ? { left: 0, bottom: 0, zIndex: 1000 }
+          : { h: "100vh", flexShrink: 0 })}
+        w={280}
+        transform={isMobile ? (isOpen ? "translateX(0)" : "translateX(-100%)") : undefined}
         bg="$backgroundLight50"
         $dark-bg="$backgroundDark900"
         borderRightWidth={1}
@@ -82,10 +108,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           $dark-borderColor="$borderDark700"
         >
           <HStack justifyContent="space-between" alignItems="flex-start">
-            <Heading size="md" className="mdq-sidebar-title">
+            <Heading size="md">
               {quizTitle}
             </Heading>
-            {isOpen && (
+            {isMobile && isOpen && (
               <Button
                 variant="link"
                 action="secondary"
@@ -106,7 +132,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               size="sm"
               color="$textLight500"
               $dark-color="$textDark400"
-              className="mdq-sidebar-desc"
             >
               {quizDescription}
             </Text>
@@ -170,7 +195,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           key={question.id}
                           variant="link"
                           action="secondary"
-                          className={`mdq-sidebar-question-link ${isActive ? "active" : ""}`}
                           onClick={() => {
                             onSelect(sIdx, qIdx);
                             onClose();
@@ -229,7 +253,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               flex={1}
               onClick={onRetake}
               onPress={onRetake}
-              className="mdq-btn mdq-btn-secondary"
             >
               <ButtonText>Retake</ButtonText>
             </Button>

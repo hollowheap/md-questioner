@@ -48,8 +48,8 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
   };
 
   return (
-    <Box className="mdq-multi-choice">
-      <Box mb="$5" className="mdq-options-list" role="radiogroup" aria-label={question.title}>
+    <Box>
+      <Box mb="$5" role="radiogroup" aria-label={question.title}>
         {options.map((opt) => {
           const isSelected = selectedId === opt.id;
           let borderColor = isSelected ? "$primary500" : "$borderLight200";
@@ -101,7 +101,6 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
           mt="$2"
           variant="solid"
           action="primary"
-          className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={!selectedId || disabled}
@@ -113,8 +112,7 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
       {isLocked && question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
-          <div
-            className="mdq-explanation-body"
+          <Box
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
         </Card>

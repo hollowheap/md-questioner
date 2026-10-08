@@ -37,13 +37,31 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
   if (!quizModel || !quizModel.sections || quizModel.sections.length === 0) {
     return (
-      <Box data-testid="mdq-root" testID="mdq-root" className="mdq-root" style={{ padding: "2rem" }}>
+      <Box
+        data-testid="mdq-root"
+        testID="mdq-root"
+        flexDirection="row"
+        minHeight="100vh"
+        bg="$backgroundLight0"
+        $dark-bg="$backgroundDark950"
+        p="$8"
+      >
         <Text>No quiz content available.</Text>
       </Box>
     );
   }
 
   const storageKey = `mdq-progress-${quizModel.contentHash}`;
+
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window !== "undefined") return window.innerWidth < 1024;
+    return false;
+  });
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
 
   const [activeSectionIndex, setActiveSectionIndex] = useState<number>(0);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState<number>(0);
@@ -189,7 +207,14 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
   return (
     <GluestackThemeProvider>
-      <Box data-testid="mdq-root" testID="mdq-root" className="mdq-root" style={{ flexDirection: "row", minHeight: "100vh" }}>
+      <Box
+        data-testid="mdq-root"
+        testID="mdq-root"
+        flexDirection="row"
+        minHeight="100vh"
+        bg="$backgroundLight0"
+        $dark-bg="$backgroundDark950"
+      >
         <Sidebar
           quizTitle={quizModel.title}
           quizDescription={quizModel.description}
@@ -203,7 +228,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           onRetake={() => setShowRetakeModal(true)}
         />
 
-        <Box className="mdq-main" role="main">
+        <Box flex={1} display="flex" flexDirection="column" minWidth={0} minHeight="100vh" role="main">
           <HStack
             justifyContent="space-between"
             alignItems="center"
@@ -213,13 +238,14 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
             $dark-borderColor="$borderDark700"
             bg="$backgroundLight0"
             $dark-bg="$backgroundDark900"
-            className="mdq-top-bar"
           >
             <HStack space="md" alignItems="center">
               <Button
+                data-testid="mdq-menu-toggle"
+                testID="mdq-menu-toggle"
                 variant="outline"
                 action="secondary"
-                className="mdq-btn mdq-menu-toggle"
+                display={isMobile ? "flex" : "none"}
                 onClick={() => setIsDrawerOpen(true)}
                 onPress={() => setIsDrawerOpen(true)}
                 aria-label="Open navigation menu"
@@ -240,7 +266,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           </HStack>
 
           <ScrollView flex={1}>
-            <Box maxW={820} w="100%" mx="auto" p="$6" pb="$24" className="mdq-content-container">
+            <Box maxW={820} w="100%" mx="auto" p="$6" pb="$24">
               <SectionTabs
                 sections={quizModel.sections}
                 activeIndex={activeSectionIndex}
@@ -274,7 +300,19 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
         </Box>
 
         {showRetakeModal && (
-          <Box className="mdq-modal-backdrop" bg="rgba(0, 0, 0, 0.5)" p="$5" onClick={() => setShowRetakeModal(false)}>
+          <Box
+            position="fixed"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="rgba(0, 0, 0, 0.5)"
+            zIndex={2000}
+            justifyContent="center"
+            alignItems="center"
+            p="$5"
+            onClick={() => setShowRetakeModal(false)}
+          >
             <Card variant="elevated" p="$6" maxW={440} w="100%" onClick={(e: any) => e?.stopPropagation?.()}>
               <Heading size="md" mb="$2">Retake Quiz</Heading>
               <Text mb="$4">Would you like to reset your progress for the current section or the entire quiz?</Text>

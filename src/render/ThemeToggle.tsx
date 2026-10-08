@@ -29,14 +29,15 @@ export const ThemeToggle: React.FC = () => {
 
   return (
     <Button
+      data-testid="mdq-theme-toggle"
+      testID="mdq-theme-toggle"
+      size="sm"
       variant="outline"
       action="secondary"
-      className="mdq-btn mdq-btn-secondary mdq-theme-toggle"
       onClick={handleCycle}
       onPress={handleCycle}
       aria-label={`Toggle theme (current: ${theme})`}
       title="Switch between Light, Dark, and System Auto theme"
-      style={{ fontSize: "0.85rem", padding: "0.4rem 0.8rem", minHeight: "38px" }}
     >
       <ButtonText>{getLabel()}</ButtonText>
     </Button>

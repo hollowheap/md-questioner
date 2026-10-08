@@ -13,6 +13,7 @@ import {
   Badge,
   BadgeText,
   VStack,
+  HStack,
 } from "@gluestack-ui/themed";
 
 export interface EssayProps {
@@ -131,11 +132,11 @@ export const Essay: React.FC<EssayProps> = ({
   const score = totalCriteria > 0 ? Math.round((checkedCount / totalCriteria) * 100) : 100;
 
   return (
-    <Box className="mdq-essay">
+    <Box>
       {!isReviewing ? (
-        <Box className="mdq-essay-draft">
-          <Box className="mdq-essay-textarea-wrap">
-            <Textarea mb="$3" size="md" className="mdq-essay-textarea" isDisabled={disabled}>
+        <Box>
+          <Box>
+            <Textarea mb="$3" size="md" isDisabled={disabled}>
               <TextareaInput
                 placeholder="Write your essay response here..."
                 value={text}
@@ -147,50 +148,46 @@ export const Essay: React.FC<EssayProps> = ({
             </Textarea>
           </Box>
 
-          <Box mt="$3" mb="$5" className="mdq-essay-draft-footer" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem" }}>
-            <Box className="mdq-essay-counts">
-              <Text style={{ fontSize: "0.85rem", color: "var(--color-muted)" }}>
-                {wordCount} {wordCount === 1 ? "word" : "words"} • {charCount} {charCount === 1 ? "character" : "characters"}
-              </Text>
-            </Box>
+          <HStack mt="$3" mb="$5" justifyContent="space-between" alignItems="center" flexWrap="wrap" space="md">
+            <Text size="xs" color="$textLight500" $dark-color="$textDark400">
+              {wordCount} {wordCount === 1 ? "word" : "words"} • {charCount} {charCount === 1 ? "character" : "characters"}
+            </Text>
 
             <Button
               variant="solid"
               action="primary"
-              className="mdq-btn mdq-btn-primary"
               onClick={handleCheckAndReview}
               onPress={handleCheckAndReview}
               isDisabled={!text.trim() || disabled}
             >
               <ButtonText>Check & Review</ButtonText>
             </Button>
-          </Box>
+          </HStack>
         </Box>
       ) : (
-        <Box className="mdq-essay-review">
-          <Box className="mdq-essay-review-header" mb="$3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box>
+          <HStack mb="$3" justifyContent="space-between" alignItems="center">
             <Badge variant="solid" action="primary" p="$1">
               <BadgeText>Concept Coverage: {conceptMatch.coveragePercent}%</BadgeText>
             </Badge>
             <Button
               variant="outline"
               action="secondary"
-              className="mdq-btn mdq-btn-secondary"
               onClick={handleEditEssay}
               onPress={handleEditEssay}
               isDisabled={disabled}
             >
-              <ButtonText style={{ color: "inherit" }}>Edit Essay</ButtonText>
+              <ButtonText>Edit Essay</ButtonText>
             </Button>
-          </Box>
+          </HStack>
 
-          <Box className="mdq-essay-panels">
-            <Card variant="outline" p="$5" mb="$4" borderRadius="$xl">
+          <VStack space="md" mb="$4">
+            <Card variant="outline" p="$5" borderRadius="$xl">
               <Heading size="xs" mb="$2">YOUR SUBMISSION</Heading>
-              <Box className="mdq-essay-submission-text">
+              <Box>
                 {submissionSegments.map((segment, idx) =>
                   segment.isMatched ? (
-                    <mark key={idx} className="mdq-essay-match">
+                    <mark key={idx}>
                       {segment.text}
                     </mark>
                   ) : (
@@ -201,66 +198,61 @@ export const Essay: React.FC<EssayProps> = ({
             </Card>
 
             {question.modelAnswerHtml && (
-              <Card variant="outline" p="$5" mb="$4" borderRadius="$xl">
+              <Card variant="outline" p="$5" borderRadius="$xl">
                 <Heading size="xs" mb="$2">MODEL ANSWER</Heading>
-                <div
-                  className="mdq-essay-panel-body"
+                <Box
                   dangerouslySetInnerHTML={{ __html: question.modelAnswerHtml }}
                 />
               </Card>
             )}
-          </Box>
+          </VStack>
 
           <Card variant="outline" p="$5" mb="$4" borderRadius="$xl">
-            <Box className="mdq-rubric-header" mb="$3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <HStack mb="$3" justifyContent="space-between" alignItems="center">
               <Heading size="sm">Rubric Evaluation</Heading>
-              <Text style={{ fontWeight: "600", fontSize: "0.95rem", color: "var(--color-accent)" }}>
+              <Text fontWeight="$semibold" size="sm" color="$primary600" $dark-color="$dmAccent">
                 Score: {checkedCount} / {totalCriteria} criteria met ({score}%)
               </Text>
-            </Box>
+            </HStack>
 
             {rubric.length > 0 ? (
-              <VStack space="md" className="mdq-rubric-list">
+              <VStack space="md">
                 {rubric.map((criterion, idx) => (
-                  <Box key={idx} mb="$2" className="mdq-rubric-item">
-                    <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(checkedRubric[idx])}
-                        disabled={disabled}
-                        onChange={() => handleToggleCriterion(idx)}
-                        style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
-                      />
-                      <Text>{criterion}</Text>
-                    </label>
-                  </Box>
+                  <HStack key={idx} space="sm" alignItems="center">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(checkedRubric[idx])}
+                      disabled={disabled}
+                      onChange={() => handleToggleCriterion(idx)}
+                      style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
+                    />
+                    <Text size="sm">{criterion}</Text>
+                  </HStack>
                 ))}
               </VStack>
             ) : (
-              <Text style={{ margin: 0, color: "var(--color-muted)", fontSize: "0.9rem" }}>
+              <Text size="sm" color="$textLight500" $dark-color="$textDark400">
                 No rubric criteria specified.
               </Text>
             )}
           </Card>
 
-          <Box mt="$4" mb="$3" className="mdq-essay-actions">
+          <HStack mt="$4" mb="$3">
             <Button
               variant="outline"
               action="secondary"
-              className="mdq-btn mdq-btn-secondary"
               onClick={handleEditEssay}
               onPress={handleEditEssay}
               isDisabled={disabled}
             >
-              <ButtonText style={{ color: "inherit" }}>Edit Essay</ButtonText>
+              <ButtonText>Edit Essay</ButtonText>
             </Button>
-          </Box>
+          </HStack>
 
           {question.explanationHtml && (
             <Card variant="outline" mt="$5" p="$5">
               <Heading size="sm" mb="$2">Notes & Key Takeaways</Heading>
-              <div
-                className="mdq-explanation-body"
+              <Box
                 dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
               />
             </Card>

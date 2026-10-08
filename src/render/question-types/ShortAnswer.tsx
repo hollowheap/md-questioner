@@ -76,13 +76,13 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
   const isCorrect = savedAnswer ? savedAnswer.isCorrect : false;
 
   return (
-    <Box className="mdq-short-answer">
-      <Box mb="$5" className="mdq-short-answer-group">
+    <Box>
+      <Box mb="$5">
         <Input
           mb="$3"
           variant="outline"
           size="md"
-          className={`mdq-short-input ${isLocked ? (isCorrect ? "is-correct" : "is-incorrect") : ""}`}
+          isInvalid={isLocked && !isCorrect}
           isDisabled={isLocked || disabled}
         >
           <InputField
@@ -96,11 +96,9 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
           />
         </Input>
         {isLocked && !isCorrect && canonical && (
-          <Box style={{ fontSize: "0.9rem", color: "var(--color-error)", marginTop: "0.25rem" }}>
-            <Text style={{ fontSize: "0.9rem", color: "var(--color-error)" }}>
-              Expected: <strong>{canonical}</strong>
-            </Text>
-          </Box>
+          <Text size="sm" color="$error500" $dark-color="$error400">
+            Expected: {canonical}
+          </Text>
         )}
       </Box>
 
@@ -109,7 +107,6 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
           mt="$2"
           variant="solid"
           action="primary"
-          className="mdq-btn mdq-btn-primary"
           onClick={handleSubmit}
           onPress={handleSubmit}
           isDisabled={!value.trim() || disabled}
@@ -121,8 +118,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
       {isLocked && question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
-          <div
-            className="mdq-explanation-body"
+          <Box
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
         </Card>

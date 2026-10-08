@@ -53,8 +53,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   };
 
   return (
-    <Box className="mdq-multi-select">
-      <Box mb="$5" className="mdq-options-list" role="group" aria-label={question.title}>
+    <Box>
+      <Box mb="$5" role="group" aria-label={question.title}>
         {options.map((opt) => {
           const isSelected = selectedIds.includes(opt.id);
           let borderColor = isSelected ? "$primary500" : "$borderLight200";
@@ -107,7 +107,6 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           mt="$2"
           variant="solid"
           action="primary"
-          className="mdq-btn mdq-btn-primary"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={selectedIds.length === 0 || disabled}
@@ -119,8 +118,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       {isLocked && question.explanationHtml && (
         <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
-          <div
-            className="mdq-explanation-body"
+          <Box
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
         </Card>

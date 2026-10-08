@@ -263,7 +263,10 @@ export async function runHeadlessVerification(
           const html = document.documentElement;
           const themeAttr = html.getAttribute("data-theme") || "";
           const rawAccent = window.getComputedStyle(html).getPropertyValue("--color-accent").trim();
-          const primaryBtn = document.querySelector<HTMLElement>(".mdq-btn-primary");
+          const primaryBtn =
+            document.querySelector<HTMLElement>('button[data-variant="solid"]') ||
+            document.querySelector<HTMLElement>('.mdq-btn-primary') ||
+            document.querySelector<HTMLElement>('button');
           const resolvedAccent = primaryBtn
             ? window.getComputedStyle(primaryBtn).backgroundColor
             : rawAccent;
@@ -272,7 +275,10 @@ export async function runHeadlessVerification(
       };
 
       const initialTheme = await getThemeState();
-      const themeToggleBtn = page.locator(".mdq-theme-toggle");
+      const themeToggleBtn = page
+        .locator('[data-testid="mdq-theme-toggle"]')
+        .or(page.locator('[aria-label*="Toggle theme"]'))
+        .or(page.locator(".mdq-theme-toggle"));
       await themeToggleBtn.waitFor({ state: "visible", timeout: 4000 });
       await themeToggleBtn.click();
       await page.waitForTimeout(100);
@@ -316,9 +322,15 @@ export async function runHeadlessVerification(
       await page.waitForTimeout(100);
 
       const mobileState = await page.evaluate(() => {
-        const stepper = document.querySelector(".mdq-stepper");
-        const sidebar = document.querySelector(".mdq-sidebar");
-        const menuToggle = document.querySelector(".mdq-menu-toggle");
+        const stepper =
+          document.querySelector('[data-testid="mdq-stepper"]') ||
+          document.querySelector(".mdq-stepper");
+        const sidebar =
+          document.querySelector('[data-testid="mdq-sidebar"]') ||
+          document.querySelector(".mdq-sidebar");
+        const menuToggle =
+          document.querySelector('[data-testid="mdq-menu-toggle"]') ||
+          document.querySelector(".mdq-menu-toggle");
 
         const stepperComputed = stepper ? window.getComputedStyle(stepper) : null;
         const stepperRect = stepper ? stepper.getBoundingClientRect() : null;

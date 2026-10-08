@@ -20,6 +20,13 @@ export const Stepper: React.FC<StepperProps> = ({
 }) => {
   return (
     <HStack
+      data-testid="mdq-stepper"
+      testID="mdq-stepper"
+      position="sticky"
+      bottom={0}
+      left={0}
+      right={0}
+      zIndex={90}
       justifyContent="space-between"
       alignItems="center"
       p="$4"
@@ -28,14 +35,12 @@ export const Stepper: React.FC<StepperProps> = ({
       $dark-borderColor="$borderDark700"
       bg="$backgroundLight0"
       $dark-bg="$backgroundDark900"
-      className="mdq-stepper"
       aria-label="Question Stepper"
       role="contentinfo"
     >
       <Button
         variant="outline"
         action="secondary"
-        className="mdq-btn mdq-btn-secondary"
         onClick={onPrev}
         onPress={onPrev}
         isDisabled={!hasPrev}
@@ -44,14 +49,13 @@ export const Stepper: React.FC<StepperProps> = ({
         <ButtonText>‹ Prev</ButtonText>
       </Button>
 
-      <Text fontWeight="$medium" className="mdq-stepper-center">
+      <Text fontWeight="$medium">
         Q {current + 1} / {total}
       </Text>
 
       <Button
         variant="solid"
         action="primary"
-        className="mdq-btn mdq-btn-primary"
         onClick={onNext}
         onPress={onNext}
         isDisabled={!hasNext}
