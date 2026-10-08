@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text } from "@gluestack-ui/themed";
+import { Box, Button, ButtonText, Card, Text } from "@gluestack-ui/themed";
 
 export interface HintProps {
   hint?: string;
@@ -13,20 +13,20 @@ export const Hint: React.FC<HintProps> = ({ hint }) => {
   }
 
   return (
-    <Box className="mdq-hint">
-      <button
-        type="button"
-        className="mdq-hint-toggle"
-        onClick={() => setIsOpen(!isOpen)}
+    <Box mb="$4">
+      <Button
+        size="sm"
+        variant="outline"
+        action="secondary"
+        onPress={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
-        <Text>Hint</Text>
-        <Text>{isOpen ? "Hide" : "Show"}</Text>
-      </button>
+        <ButtonText>Hint: {isOpen ? "Hide" : "Show"}</ButtonText>
+      </Button>
       {isOpen && (
-        <Box className="mdq-hint-content">
+        <Card variant="outline" mt="$2" p="$3">
           <Text>{hint}</Text>
-        </Box>
+        </Card>
       )}
     </Box>
   );

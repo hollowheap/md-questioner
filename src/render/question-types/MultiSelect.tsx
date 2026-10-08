@@ -5,6 +5,10 @@ import {
   Text,
   Button,
   ButtonText,
+  Pressable,
+  HStack,
+  Card,
+  Heading,
 } from "@gluestack-ui/themed";
 
 export interface MultiSelectProps {
@@ -53,35 +57,47 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       <Box className="mdq-options-list" role="group" aria-label={question.title}>
         {options.map((opt) => {
           const isSelected = selectedIds.includes(opt.id);
-          let statusClass = "";
+          let borderColor = isSelected ? "$primary500" : "$borderLight200";
+          let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
 
           if (isLocked) {
             if (opt.isCorrect) {
-              statusClass = "is-correct";
+              borderColor = "$primary500";
+              bgColor = "$primary100";
             } else if (isSelected && !opt.isCorrect) {
-              statusClass = "is-incorrect";
+              borderColor = "$borderDark700";
+              bgColor = "$backgroundLight100";
             }
           }
 
           return (
-            <label
+            <Pressable
               key={opt.id}
-              className={`mdq-option-label ${isSelected ? "selected" : ""} ${statusClass} ${isLocked ? "locked" : ""}`}
-              onClick={(e) => {
-                if (e.target instanceof HTMLInputElement) return;
-                handleToggle(opt.id);
-              }}
+              p="$3"
+              mb="$2"
+              borderWidth={1}
+              borderRadius="$md"
+              borderColor={borderColor}
+              bg={bgColor}
+              disabled={isLocked || disabled}
+              onPress={() => handleToggle(opt.id)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isSelected }}
             >
-              <input
-                type="checkbox"
-                name={`ms-${question.id}-${opt.id}`}
-                value={opt.id}
-                checked={isSelected}
-                disabled={isLocked || disabled}
-                onChange={() => handleToggle(opt.id)}
-              />
-              <Text className="mdq-option-text">{opt.text}</Text>
-            </label>
+              <HStack space="md" alignItems="center">
+                <input
+                  type="checkbox"
+                  name={`ms-${question.id}-${opt.id}`}
+                  value={opt.id}
+                  checked={isSelected}
+                  disabled={isLocked || disabled}
+                  onChange={() => handleToggle(opt.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
+                />
+                <Text fontWeight={isSelected ? "600" : "400"}>{opt.text}</Text>
+              </HStack>
+            </Pressable>
           );
         })}
       </Box>
@@ -100,13 +116,13 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       )}
 
       {isLocked && question.explanationHtml && (
-        <Box className="mdq-explanation">
-          <Text className="mdq-explanation-title">Explanation</Text>
+        <Card variant="outline" mt="$4" p="$4">
+          <Heading size="sm" mb="$2">Explanation</Heading>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </Box>
+        </Card>
       )}
     </Box>
   );

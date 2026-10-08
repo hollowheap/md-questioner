@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Text, Heading, Button, ButtonText } from "@gluestack-ui/themed";
+import { Box, Text, Heading, Button, ButtonText, Card } from "@gluestack-ui/themed";
 import { QuizModel, Section, Question as QuestionData } from "../parse/schema.js";
 import { GluestackThemeProvider } from "./Provider.js";
 import { Sidebar } from "./Sidebar.js";
@@ -259,15 +259,14 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
         {showRetakeModal && (
           <Box className="mdq-modal-backdrop" onClick={() => setShowRetakeModal(false)}>
-            <Box className="mdq-modal" onClick={(e: any) => e?.stopPropagation?.()}>
-              <Heading size="md" className="mdq-modal-title">Retake Quiz</Heading>
-              <Text>Would you like to reset your progress for the current section or the entire quiz?</Text>
-              <Box className="mdq-modal-actions">
+            <Card variant="elevated" p="$6" maxW={440} w="100%" onClick={(e: any) => e?.stopPropagation?.()}>
+              <Heading size="md" mb="$2">Retake Quiz</Heading>
+              <Text mb="$4">Would you like to reset your progress for the current section or the entire quiz?</Text>
+              <Box style={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", gap: "0.75rem" }}>
                 <Button
                   variant="link"
                   action="secondary"
                   type="button"
-                  className="mdq-btn mdq-btn-ghost"
                   onClick={() => setShowRetakeModal(false)}
                   onPress={() => setShowRetakeModal(false)}
                 >
@@ -277,7 +276,6 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                   variant="outline"
                   action="secondary"
                   type="button"
-                  className="mdq-btn mdq-btn-secondary"
                   onClick={handleResetSection}
                   onPress={handleResetSection}
                 >
@@ -287,14 +285,13 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                   variant="solid"
                   action="negative"
                   type="button"
-                  className="mdq-btn mdq-btn-primary"
                   onClick={handleResetAll}
                   onPress={handleResetAll}
                 >
                   <ButtonText>Reset All</ButtonText>
                 </Button>
               </Box>
-            </Box>
+            </Card>
           </Box>
         )}
       </Box>

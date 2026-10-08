@@ -5,6 +5,8 @@ import {
   Text,
   Button,
   ButtonText,
+  Card,
+  Heading,
 } from "@gluestack-ui/themed";
 
 export interface MatchPairsProps {
@@ -66,40 +68,44 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
   return (
     <Box className="mdq-match-pairs">
       <Box className="mdq-match-list">
-        {pairs.map((pair, idx) => {
+        {pairs.map((pair) => {
           const selectedAnswer = matches[pair.prompt] || "";
-          const isRowCorrect = isLocked && selectedAnswer === pair.answer;
           const isRowIncorrect = isLocked && selectedAnswer !== pair.answer;
 
-          let rowClass = "";
-          if (isRowCorrect) rowClass = "is-correct";
-          else if (isRowIncorrect) rowClass = "is-incorrect";
-
           return (
-            <Box key={`${question.id}-${idx}`} className={`mdq-match-row ${rowClass}`}>
-              <Text className="mdq-match-prompt">{pair.prompt}</Text>
-              <Box style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, maxWidth: "280px" }}>
-                <select
-                  className="mdq-match-select"
-                  value={selectedAnswer}
-                  disabled={isLocked || disabled}
-                  onChange={(e) => handleChange(pair.prompt, e.target.value)}
-                  aria-label={`Match for ${pair.prompt}`}
-                >
-                  <option value="">Select a match...</option>
-                  {shuffledAnswers.map((ans, aIdx) => (
-                    <option key={`${ans}-${aIdx}`} value={ans}>
-                      {ans}
-                    </option>
-                  ))}
-                </select>
-                {isRowIncorrect && (
-                  <Text style={{ fontSize: "0.8rem", color: "var(--color-error)" }}>
-                    Correct: {pair.answer}
-                  </Text>
-                )}
+            <Card key={pair.prompt} variant="outline" p="$3" mb="$2">
+              <Box style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
+                <Text style={{ flex: 1 }}>{pair.prompt}</Text>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, maxWidth: "280px" }}>
+                  <select
+                    value={selectedAnswer}
+                    disabled={isLocked || disabled}
+                    onChange={(e) => handleChange(pair.prompt, e.target.value)}
+                    style={{
+                      flex: 1,
+                      maxWidth: "280px",
+                      minHeight: "40px",
+                      padding: "0.5rem 0.75rem",
+                      borderRadius: "6px",
+                      border: "1px solid var(--color-border)",
+                      background: "var(--color-surface)",
+                      color: "var(--color-text)",
+                      fontSize: "0.95rem"
+                    }}
+                  >
+                    <option value="" disabled>Select match...</option>
+                    {shuffledAnswers.map((ans, aIdx) => (
+                      <option key={`${ans}-${aIdx}`} value={ans}>{ans}</option>
+                    ))}
+                  </select>
+                  {isRowIncorrect && (
+                    <Text style={{ fontSize: "0.8rem", color: "var(--color-error)" }}>
+                      Correct: {pair.answer}
+                    </Text>
+                  )}
+                </div>
               </Box>
-            </Box>
+            </Card>
           );
         })}
       </Box>
@@ -118,13 +124,13 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
       )}
 
       {isLocked && question.explanationHtml && (
-        <Box className="mdq-explanation">
-          <Text className="mdq-explanation-title">Explanation</Text>
+        <Card variant="outline" mt="$4" p="$4">
+          <Heading size="sm" mb="$2">Explanation</Heading>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </Box>
+        </Card>
       )}
     </Box>
   );

@@ -9,6 +9,9 @@ import {
   Box,
   Text,
   Heading,
+  Card,
+  Badge,
+  BadgeText,
 } from "@gluestack-ui/themed";
 
 export interface EssayProps {
@@ -164,12 +167,10 @@ export const Essay: React.FC<EssayProps> = ({
         </Box>
       ) : (
         <Box className="mdq-essay-review">
-          <Box className="mdq-essay-review-header">
-            <Box className="mdq-badge mdq-essay-badge">
-              <Text style={{ fontSize: "0.85rem", fontWeight: "600", color: "inherit" }}>
-                Concept Coverage: {conceptMatch.coveragePercent}%
-              </Text>
-            </Box>
+          <Box className="mdq-essay-review-header" mb="$3" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Badge variant="solid" action="primary" p="$1">
+              <BadgeText>Concept Coverage: {conceptMatch.coveragePercent}%</BadgeText>
+            </Badge>
             <Button
               variant="outline"
               action="secondary"
@@ -183,8 +184,8 @@ export const Essay: React.FC<EssayProps> = ({
           </Box>
 
           <Box className="mdq-essay-panels">
-            <Box className="mdq-essay-panel">
-              <Text className="mdq-essay-panel-title">Your Submission</Text>
+            <Card variant="outline" p="$4" mb="$3">
+              <Heading size="xs" mb="$2">YOUR SUBMISSION</Heading>
               <Box className="mdq-essay-submission-text">
                 {submissionSegments.map((segment, idx) =>
                   segment.isMatched ? (
@@ -196,40 +197,40 @@ export const Essay: React.FC<EssayProps> = ({
                   )
                 )}
               </Box>
-            </Box>
+            </Card>
 
             {question.modelAnswerHtml && (
-              <Box className="mdq-essay-panel">
-                <Text className="mdq-essay-panel-title">Model Answer</Text>
+              <Card variant="outline" p="$4" mb="$3">
+                <Heading size="xs" mb="$2">MODEL ANSWER</Heading>
                 <div
                   className="mdq-essay-panel-body"
                   dangerouslySetInnerHTML={{ __html: question.modelAnswerHtml }}
                 />
-              </Box>
+              </Card>
             )}
           </Box>
 
-          <Box className="mdq-rubric-card">
-            <Box className="mdq-rubric-header">
-              <Heading className="mdq-rubric-title">Rubric Evaluation</Heading>
-              <Text className="mdq-rubric-score">
+          <Card variant="outline" p="$4" mb="$3">
+            <Box className="mdq-rubric-header" mb="$2" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Heading size="sm">Rubric Evaluation</Heading>
+              <Text style={{ fontWeight: "600", fontSize: "0.95rem", color: "var(--color-accent)" }}>
                 Score: {checkedCount} / {totalCriteria} criteria met ({score}%)
               </Text>
             </Box>
 
             {rubric.length > 0 ? (
-              <ul className="mdq-rubric-list">
+              <ul className="mdq-rubric-list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {rubric.map((criterion, idx) => (
-                  <li key={idx} className="mdq-rubric-item">
-                    <label className="mdq-rubric-label">
+                  <li key={idx} className="mdq-rubric-item" style={{ marginBottom: "0.5rem" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}>
                       <input
                         type="checkbox"
-                        className="mdq-rubric-checkbox"
                         checked={Boolean(checkedRubric[idx])}
                         disabled={disabled}
                         onChange={() => handleToggleCriterion(idx)}
+                        style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
                       />
-                      <Text className="mdq-rubric-text">{criterion}</Text>
+                      <Text>{criterion}</Text>
                     </label>
                   </li>
                 ))}
@@ -239,10 +240,12 @@ export const Essay: React.FC<EssayProps> = ({
                 No rubric criteria specified.
               </Text>
             )}
-          </Box>
+          </Card>
 
-          <Box className="mdq-essay-actions">
+          <Box className="mdq-essay-actions" mb="$3">
             <Button
+              variant="outline"
+              action="secondary"
               className="mdq-btn mdq-btn-secondary"
               onClick={handleEditEssay}
               onPress={handleEditEssay}
@@ -253,13 +256,13 @@ export const Essay: React.FC<EssayProps> = ({
           </Box>
 
           {question.explanationHtml && (
-            <Box className="mdq-explanation">
-              <Text className="mdq-explanation-title">Notes & Key Takeaways</Text>
+            <Card variant="outline" mt="$4" p="$4">
+              <Heading size="sm" mb="$2">Notes & Key Takeaways</Heading>
               <div
                 className="mdq-explanation-body"
                 dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
               />
-            </Box>
+            </Card>
           )}
         </Box>
       )}
