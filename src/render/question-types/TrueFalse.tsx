@@ -6,6 +6,8 @@ import {
   Button,
   ButtonText,
   HStack,
+  Card,
+  Heading,
 } from "@gluestack-ui/themed";
 
 export interface TrueFalseProps {
@@ -66,6 +68,10 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
     return (
       <Button
         key={opt.id}
+        flex={1}
+        minHeight={52}
+        p="$3"
+        borderRadius="$xl"
         variant={isSelected ? "solid" : "outline"}
         action={isSelected ? "primary" : "secondary"}
         className={`mdq-tf-btn ${isSelected ? "selected" : ""} ${statusClass}`}
@@ -80,13 +86,14 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 
   return (
     <Box className="mdq-true-false">
-      <HStack className="mdq-tf-group">
+      <HStack space="md" mb="$5" className="mdq-tf-group">
         {renderButton(trueOption, "True")}
         {renderButton(falseOption, "False")}
       </HStack>
 
       {!isLocked && (
         <Button
+          mt="$2"
           variant="solid"
           action="primary"
           className="mdq-btn mdq-btn-primary"
@@ -99,13 +106,13 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
       )}
 
       {isLocked && question.explanationHtml && (
-        <Box className="mdq-explanation">
-          <Text className="mdq-explanation-title">Explanation</Text>
+        <Card variant="outline" mt="$5" p="$5">
+          <Heading size="sm" mb="$2">Explanation</Heading>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </Box>
+        </Card>
       )}
     </Box>
   );

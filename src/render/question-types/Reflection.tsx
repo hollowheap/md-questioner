@@ -5,6 +5,8 @@ import {
   TextareaInput,
   Box,
   Text,
+  Card,
+  Heading,
 } from "@gluestack-ui/themed";
 
 export interface ReflectionProps {
@@ -40,8 +42,8 @@ export const Reflection: React.FC<ReflectionProps> = ({
 
   return (
     <Box className="mdq-reflection">
-      <Box className="mdq-reflection-group">
-        <Textarea size="md" className="mdq-reflection-textarea" isDisabled={disabled}>
+      <Box mb="$5" className="mdq-reflection-group">
+        <Textarea mb="$3" size="md" className="mdq-reflection-textarea" isDisabled={disabled}>
           <TextareaInput
             placeholder="Reflect on this question, write down your reasoning, or take study notes..."
             value={text}
@@ -54,13 +56,13 @@ export const Reflection: React.FC<ReflectionProps> = ({
       </Box>
 
       {question.explanationHtml && (
-        <Box className="mdq-explanation">
-          <Text className="mdq-explanation-title">Suggested Notes & Key Takeaways</Text>
+        <Card variant="outline" mt="$5" p="$5">
+          <Heading size="sm" mb="$2">Suggested Notes & Key Takeaways</Heading>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </Box>
+        </Card>
       )}
     </Box>
   );

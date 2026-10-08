@@ -100,25 +100,30 @@ export const Question: React.FC<QuestionProps> = ({
   };
 
   return (
-    <Card variant="outline" className="mdq-card mdq-question" data-question-id={question.id}>
-      <Box className="mdq-question-header">
+    <Card variant="outline" p="$6" mb="$6" className="mdq-card mdq-question" data-question-id={question.id}>
+      <Box mb="$3" className="mdq-question-header">
         <Text className="mdq-question-meta">
           {sectionTitle ? `${sectionTitle} • ` : ""}Question {questionIndex + 1} of {totalInSection}
         </Text>
       </Box>
 
-      <Heading size="md" className="mdq-question-title">{question.title}</Heading>
+      <Heading size="md" mb="$4" className="mdq-question-title">{question.title}</Heading>
 
       {question.promptHtml && (
         <Box
+          mb="$5"
           className="mdq-prompt"
           dangerouslySetInnerHTML={{ __html: question.promptHtml }}
         />
       )}
 
-      {question.hint && <Hint hint={question.hint} />}
+      {question.hint && (
+        <Box mb="$5">
+          <Hint hint={question.hint} />
+        </Box>
+      )}
 
-      <Box className="mdq-interaction-container">
+      <Box mt="$2" className="mdq-interaction-container">
         {renderQuestionBody()}
       </Box>
     </Card>

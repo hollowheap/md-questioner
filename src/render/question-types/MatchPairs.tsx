@@ -67,13 +67,13 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
 
   return (
     <Box className="mdq-match-pairs">
-      <Box className="mdq-match-list">
+      <Box mb="$5" className="mdq-match-list">
         {pairs.map((pair) => {
           const selectedAnswer = matches[pair.prompt] || "";
           const isRowIncorrect = isLocked && selectedAnswer !== pair.answer;
 
           return (
-            <Card key={pair.prompt} variant="outline" p="$3" mb="$2">
+            <Card key={pair.prompt} variant="outline" p="$4" mb="$3" borderRadius="$xl">
               <Box style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>
                 <Text style={{ flex: 1 }}>{pair.prompt}</Text>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", flex: 1, maxWidth: "280px" }}>
@@ -112,6 +112,7 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
 
       {!isLocked && (
         <Button
+          mt="$2"
           variant="solid"
           action="primary"
           className="mdq-btn mdq-btn-primary"
@@ -124,7 +125,7 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
       )}
 
       {isLocked && question.explanationHtml && (
-        <Card variant="outline" mt="$4" p="$4">
+        <Card variant="outline" mt="$5" p="$5">
           <Heading size="sm" mb="$2">Explanation</Heading>
           <div
             className="mdq-explanation-body"

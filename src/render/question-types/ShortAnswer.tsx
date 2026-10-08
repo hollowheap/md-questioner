@@ -7,6 +7,8 @@ import {
   ButtonText,
   Box,
   Text,
+  Card,
+  Heading,
 } from "@gluestack-ui/themed";
 
 function levenshtein(a: string, b: string): number {
@@ -75,8 +77,9 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
 
   return (
     <Box className="mdq-short-answer">
-      <Box className="mdq-short-answer-group">
+      <Box mb="$5" className="mdq-short-answer-group">
         <Input
+          mb="$3"
           variant="outline"
           size="md"
           className={`mdq-short-input ${isLocked ? (isCorrect ? "is-correct" : "is-incorrect") : ""}`}
@@ -103,6 +106,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
 
       {!isLocked && (
         <Button
+          mt="$2"
           variant="solid"
           action="primary"
           className="mdq-btn mdq-btn-primary"
@@ -115,13 +119,13 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
       )}
 
       {isLocked && question.explanationHtml && (
-        <Box className="mdq-explanation">
-          <Text className="mdq-explanation-title">Explanation</Text>
+        <Card variant="outline" mt="$5" p="$5">
+          <Heading size="sm" mb="$2">Explanation</Heading>
           <div
             className="mdq-explanation-body"
             dangerouslySetInnerHTML={{ __html: question.explanationHtml }}
           />
-        </Box>
+        </Card>
       )}
     </Box>
   );

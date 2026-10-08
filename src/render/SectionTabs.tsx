@@ -19,7 +19,7 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
 
   return (
     <Box role="navigation" aria-label="Sections">
-      <HStack className="mdq-section-tabs" role="tablist">
+      <HStack className="mdq-section-tabs" space="sm" mb="$5" role="tablist">
         {sections.map((section, idx) => {
           const isActive = idx === activeIndex;
           return (
