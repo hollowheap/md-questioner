@@ -23,11 +23,41 @@ const commonSpace = {
 
 const commonRadii = {
   ...defaultConfig.tokens.radii,
-  sm: 0.01,
-  xl: 12,
-  "2xl": 16,
-  "2xl-2": 20,
-  "3xl": 24,
+  sm: 10,
+  md: 14,
+  lg: 18,
+  xl: 20,
+  "2xl": 24,
+  "2xl-2": 24,
+  "3xl": 28,
+  full: 9999,
+};
+
+const commonComponents = {
+  ...defaultConfig.components,
+  Button: {
+    ...defaultConfig.components.Button,
+    theme: {
+      ...defaultConfig.components.Button.theme,
+      borderRadius: "$2xl",
+    },
+  },
+  Card: {
+    ...defaultConfig.components.Card,
+    theme: {
+      ...defaultConfig.components.Card.theme,
+      variants: {
+        ...defaultConfig.components.Card.theme.variants,
+        size: {
+          ...defaultConfig.components.Card.theme.variants.size,
+          lg: {
+            p: "$8",
+            borderRadius: "$3xl",
+          },
+        },
+      },
+    },
+  },
 };
 
 const commonFonts = {
@@ -90,6 +120,7 @@ const commonGlobalStyle = {
 
 export const gluestackLightConfig = createConfig({
   ...defaultConfig,
+  components: commonComponents,
   tokens: {
     ...defaultConfig.tokens,
     colors: {
@@ -184,6 +215,7 @@ export const gluestackLightConfig = createConfig({
 
 export const gluestackDarkConfig = createConfig({
   ...defaultConfig,
+  components: commonComponents,
   tokens: {
     ...defaultConfig.tokens,
     colors: {

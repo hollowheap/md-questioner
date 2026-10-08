@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, ButtonText } from "@gluestack-ui/themed";
+import { Button, ButtonText, ButtonIcon, SunIcon, MoonIcon } from "@gluestack-ui/themed";
 import { useTheme } from "./Provider.js";
 
 export const ThemeToggle: React.FC = () => {
@@ -39,6 +39,7 @@ export const ThemeToggle: React.FC = () => {
       aria-label={`Toggle theme (current: ${theme})`}
       title="Switch between Light, Dark, and System Auto theme"
     >
+      <ButtonIcon as={theme === "dark" ? MoonIcon : SunIcon} mr="$1.5" />
       <ButtonText>{getLabel()}</ButtonText>
     </Button>
   );

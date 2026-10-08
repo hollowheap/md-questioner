@@ -1,5 +1,13 @@
 import React from "react";
-import { HStack, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import {
+  HStack,
+  Text,
+  Button,
+  ButtonText,
+  ButtonIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@gluestack-ui/themed";
 
 export interface StepperProps {
   current: number;
@@ -30,7 +38,7 @@ export const Stepper: React.FC<StepperProps> = ({
       justifyContent="space-between"
       alignItems="center"
       px="$8"
-      py="$5"
+      py="$4"
       borderTopWidth={1}
       borderColor="$borderLight200"
       $dark-borderColor="$borderDark700"
@@ -41,9 +49,6 @@ export const Stepper: React.FC<StepperProps> = ({
     >
       <Button
         size="md"
-        px="$5"
-        py="$3"
-        borderRadius="$xl"
         variant="outline"
         action="secondary"
         onClick={onPrev}
@@ -51,7 +56,8 @@ export const Stepper: React.FC<StepperProps> = ({
         isDisabled={!hasPrev}
         aria-label="Previous question"
       >
-        <ButtonText>‹ Prev</ButtonText>
+        <ButtonIcon as={ChevronLeftIcon} mr="$1.5" />
+        <ButtonText>Prev</ButtonText>
       </Button>
 
       <Text size="md" fontWeight="$medium">
@@ -60,9 +66,6 @@ export const Stepper: React.FC<StepperProps> = ({
 
       <Button
         size="md"
-        px="$5"
-        py="$3"
-        borderRadius="$xl"
         variant="solid"
         action="primary"
         onClick={onNext}
@@ -70,7 +73,8 @@ export const Stepper: React.FC<StepperProps> = ({
         isDisabled={!hasNext}
         aria-label="Next question"
       >
-        <ButtonText>Next ›</ButtonText>
+        <ButtonText>Next</ButtonText>
+        <ButtonIcon as={ChevronRightIcon} ml="$1.5" />
       </Button>
     </HStack>
   );

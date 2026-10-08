@@ -121,8 +121,6 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           size="md"
           variant="solid"
           action="primary"
-          px="$6"
-          py="$3.5"
           onClick={handleCheck}
           onPress={handleCheck}
           isDisabled={selectedIds.length === 0 || disabled}

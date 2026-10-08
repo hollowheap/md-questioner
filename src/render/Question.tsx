@@ -101,7 +101,7 @@ export const Question: React.FC<QuestionProps> = ({
   };
 
   return (
-    <Card variant="outline" p="$8" mb="$8" borderRadius="$3xl" data-question-id={question.id}>
+    <Card variant="outline" size="lg" mb="$8" data-question-id={question.id}>
       <Box mb="$2">
         <Text size="sm" color="$textLight500" $dark-color="$textDark400">
           {sectionTitle ? `${sectionTitle} • ` : ""}Question {questionIndex + 1} of {totalInSection}
@@ -122,7 +122,7 @@ export const Question: React.FC<QuestionProps> = ({
         </Box>
       )}
 
-      <Box mt="$2">
+      <Box mt="$4">
         {renderQuestionBody()}
       </Box>
     </Card>

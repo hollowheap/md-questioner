@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, ButtonText } from "@gluestack-ui/themed";
+import { Button, ButtonText, ButtonIcon, RepeatIcon } from "@gluestack-ui/themed";
 
 export interface ShuffleProps {
   isShuffled?: boolean;
@@ -26,9 +26,6 @@ export const Shuffle: React.FC<ShuffleProps> = ({
   return (
     <Button
       size="md"
-      px="$4"
-      py="$2"
-      borderRadius="$xl"
       variant={isShuffled ? "solid" : "outline"}
       action={isShuffled ? "primary" : "secondary"}
       type="button"
@@ -37,6 +34,7 @@ export const Shuffle: React.FC<ShuffleProps> = ({
       title={isShuffled ? "Restore original order" : "Shuffle questions in this section"}
       aria-pressed={isShuffled}
     >
+      <ButtonIcon as={RepeatIcon} mr="$2" />
       <ButtonText>{isShuffled ? "Shuffled" : "Shuffle"}</ButtonText>
     </Button>
   );

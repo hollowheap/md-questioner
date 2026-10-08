@@ -30,11 +30,14 @@
   --space-unit: 4px;
 
   /* Radius tokens */
-  --radius-sm: 0.01px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-2xl-2: 20px;
-  --radius-3xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-2xl-2: 24px;
+  --radius-3xl: 28px;
+  --radius-full: 9999px;
 
   /* Shadow tokens */
   --shadow-subtle: oklab(0 0 0 / 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.08) 0px 4px 24px 0px;

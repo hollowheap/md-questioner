@@ -27,9 +27,6 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
               key={section.id}
               type="button"
               size="md"
-              px="$5"
-              py="$3"
-              borderRadius="$xl"
               variant={isActive ? "solid" : "outline"}
               action={isActive ? "primary" : "secondary"}
               onClick={() => onSelect(idx)}

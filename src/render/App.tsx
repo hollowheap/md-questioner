@@ -5,6 +5,8 @@ import {
   Heading,
   Button,
   ButtonText,
+  ButtonIcon,
+  MenuIcon,
   Card,
   ScrollView,
   HStack,
@@ -229,59 +231,60 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
         />
 
         <Box flex={1} display="flex" flexDirection="column" minWidth={0} minHeight="100vh" role="main">
-          <HStack
-            justifyContent="space-between"
-            alignItems="center"
-            px={isMobile ? "$6" : "$8"}
-            py={isMobile ? "$4" : "$5"}
+          <Box
+            px={isMobile ? "$4" : "$8"}
+            py="$4"
             borderBottomWidth={1}
             borderColor="$borderLight200"
             $dark-borderColor="$borderDark700"
             bg="$backgroundLight0"
             $dark-bg="$backgroundDark900"
           >
-            {isMobile ? (
-              <HStack space="md" alignItems="center">
-                <Button
-                  data-testid="mdq-menu-toggle"
-                  testID="mdq-menu-toggle"
-                  variant="outline"
-                  action="secondary"
-                  onClick={() => setIsDrawerOpen(true)}
-                  onPress={() => setIsDrawerOpen(true)}
-                  aria-label="Open navigation menu"
-                >
-                  <ButtonText>☰</ButtonText>
-                </Button>
-                <Heading size="sm">{quizModel.title}</Heading>
-              </HStack>
-            ) : (
-              <HStack space="sm" alignItems="center">
-                <Text size="sm" fontWeight="$semibold">{currentSection.title}</Text>
-                <Text size="sm" color="$textLight400">•</Text>
-                <Text size="sm" color="$textLight600" $dark-color="$textDark400">
-                  Question {activeQuestionIndex + 1} of {displayedQuestions.length}
-                </Text>
-              </HStack>
-            )}
+            <HStack maxW={880} w="100%" mx="auto" justifyContent="space-between" alignItems="center">
+              {isMobile ? (
+                <HStack space="md" alignItems="center">
+                  <Button
+                    data-testid="mdq-menu-toggle"
+                    testID="mdq-menu-toggle"
+                    variant="outline"
+                    action="secondary"
+                    size="sm"
+                    onClick={() => setIsDrawerOpen(true)}
+                    onPress={() => setIsDrawerOpen(true)}
+                    aria-label="Open navigation menu"
+                  >
+                    <ButtonIcon as={MenuIcon} size="md" />
+                  </Button>
+                  <Heading size="sm">{quizModel.title}</Heading>
+                </HStack>
+              ) : (
+                <HStack space="sm" alignItems="center">
+                  <Text size="sm" fontWeight="$semibold">{currentSection.title}</Text>
+                  <Text size="sm" color="$textLight400">•</Text>
+                  <Text size="sm" color="$textLight600" $dark-color="$textDark400">
+                    Question {activeQuestionIndex + 1} of {displayedQuestions.length}
+                  </Text>
+                </HStack>
+              )}
 
-            <Shuffle
-              isShuffled={isShuffled}
-              onToggle={() => {
-                setIsShuffled(!isShuffled);
-                setActiveQuestionIndex(0);
-              }}
-              noShuffle={noShuffle}
-            />
-          </HStack>
+              <Shuffle
+                isShuffled={isShuffled}
+                onToggle={() => {
+                  setIsShuffled(!isShuffled);
+                  setActiveQuestionIndex(0);
+                }}
+                noShuffle={noShuffle}
+              />
+            </HStack>
+          </Box>
 
           <ScrollView flex={1}>
             <Box
-              maxW={780}
+              maxW={880}
               w="100%"
               mx="auto"
-              px={isMobile ? "$5" : "$8"}
-              py={isMobile ? "$6" : "$10"}
+              px={isMobile ? "$4" : "$8"}
+              py={isMobile ? "$6" : "$8"}
               pb={isMobile ? "$28" : "$32"}
             >
               <SectionTabs
@@ -335,6 +338,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
               <Text mb="$4">Would you like to reset your progress for the current section or the entire quiz?</Text>
               <HStack space="md" justifyContent="flex-end">
                 <Button
+                  size="md"
                   variant="link"
                   action="secondary"
                   onClick={() => setShowRetakeModal(false)}
@@ -343,6 +347,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                   <ButtonText>Cancel</ButtonText>
                 </Button>
                 <Button
+                  size="md"
                   variant="outline"
                   action="secondary"
                   onClick={handleResetSection}
@@ -351,6 +356,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                   <ButtonText>Reset Section</ButtonText>
                 </Button>
                 <Button
+                  size="md"
                   variant="solid"
                   action="negative"
                   onClick={handleResetAll}

@@ -5,6 +5,11 @@ import {
   Text,
   Button,
   ButtonText,
+  ButtonIcon,
+  Icon,
+  CloseIcon,
+  CheckIcon,
+  CircleIcon,
   VStack,
   HStack,
   ScrollView,
@@ -113,16 +118,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </Heading>
             {isMobile && isOpen && (
               <Button
+                size="sm"
                 variant="link"
                 action="secondary"
                 onClick={onClose}
                 onPress={onClose}
                 aria-label="Close navigation drawer"
                 p="$1"
-                minHeight={36}
-                minWidth={36}
               >
-                <ButtonText>✕</ButtonText>
+                <ButtonIcon as={CloseIcon} size="md" />
               </Button>
             )}
           </HStack>
@@ -174,17 +178,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
                       const ans = answeredQuestions[question.id];
 
-                      let statusIcon = "○";
+                      let StatusIcon = CircleIcon;
                       let statusColor = "$textLight400";
                       let statusDarkColor = "$textDark500";
 
                       if (ans) {
                         if (ans.isCorrect) {
-                          statusIcon = "✓";
+                          StatusIcon = CheckIcon;
                           statusColor = "$success500";
                           statusDarkColor = "$dmAccent";
                         } else {
-                          statusIcon = "✗";
+                          StatusIcon = CloseIcon;
                           statusColor = "$error500";
                           statusDarkColor = "$error400";
                         }
@@ -211,9 +215,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           minHeight={46}
                           borderRadius="$xl"
                         >
-                          <Text mr="$2" color={statusColor} $dark-color={statusDarkColor}>
-                            {statusIcon}
-                          </Text>
+                          <Icon as={StatusIcon} size="xs" mr="$2" color={statusColor} $dark-color={statusDarkColor} />
                           <ButtonText
                             numberOfLines={1}
                             color={isActive ? "$primary600" : "$textLight800"}
@@ -247,9 +249,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
           <HStack space="sm" mt="$4">
             <Button
+              size="sm"
               variant="outline"
               action="secondary"
-              size="sm"
               flex={1}
               onClick={onRetake}
               onPress={onRetake}
