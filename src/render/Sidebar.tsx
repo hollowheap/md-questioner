@@ -1,5 +1,14 @@
 import React from "react";
-import { Box, Heading, Text, Button, ButtonText, VStack } from "@gluestack-ui/themed";
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  ButtonText,
+  VStack,
+  HStack,
+  ScrollView,
+} from "@gluestack-ui/themed";
 import { Section } from "../parse/schema.js";
 import { Progress } from "./Progress.js";
 import { ThemeToggle } from "./ThemeToggle.js";
@@ -56,105 +65,176 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClick={onClose}
         aria-hidden="true"
       />
-      <Box className={`mdq-sidebar ${isOpen ? "open" : ""}`} aria-label="Quiz Navigation" role="complementary">
-        <Box className="mdq-sidebar-header">
-          <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <Heading size="md" className="mdq-sidebar-title">{quizTitle}</Heading>
+      <Box
+        className={`mdq-sidebar ${isOpen ? "open" : ""}`}
+        bg="$backgroundLight50"
+        $dark-bg="$backgroundDark900"
+        borderRightWidth={1}
+        borderColor="$borderLight200"
+        $dark-borderColor="$borderDark700"
+        aria-label="Quiz Navigation"
+        role="complementary"
+      >
+        <Box
+          p="$5"
+          borderBottomWidth={1}
+          borderColor="$borderLight200"
+          $dark-borderColor="$borderDark700"
+        >
+          <HStack justifyContent="space-between" alignItems="flex-start">
+            <Heading size="md" className="mdq-sidebar-title">
+              {quizTitle}
+            </Heading>
             {isOpen && (
               <Button
-                type="button"
-                className="mdq-btn mdq-btn-ghost"
+                variant="link"
+                action="secondary"
                 onClick={onClose}
                 onPress={onClose}
                 aria-label="Close navigation drawer"
-                style={{ padding: "0.25rem 0.5rem", minHeight: "36px", minWidth: "36px" }}
+                p="$1"
+                minHeight={36}
+                minWidth={36}
               >
                 <ButtonText>✕</ButtonText>
               </Button>
             )}
-          </Box>
-          {quizDescription && <Text className="mdq-sidebar-desc">{quizDescription}</Text>}
+          </HStack>
+          {quizDescription && (
+            <Text
+              mt="$1"
+              size="sm"
+              color="$textLight500"
+              $dark-color="$textDark400"
+              className="mdq-sidebar-desc"
+            >
+              {quizDescription}
+            </Text>
+          )}
         </Box>
 
-        <Box className="mdq-sidebar-sections" role="navigation" aria-label="Quiz Sections">
-          {sections.map((section, sIdx) => {
-            const secProgress = sectionProgressList[sIdx];
-            return (
-              <Box key={section.id} className="mdq-sidebar-section">
-                <Box className="mdq-sidebar-section-header">
-                  <Text>{section.title}</Text>
-                  <Text>
-                    {secProgress.correct} / {secProgress.total}
-                  </Text>
-                </Box>
-                <VStack style={{ gap: "2px" }}>
-                  {section.questions.map((question, qIdx) => {
-                    const isActive = sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
-                    const ans = answeredQuestions[question.id];
+        <ScrollView flex={1} p="$3" role="navigation" aria-label="Quiz Sections">
+          <VStack space="md">
+            {sections.map((section, sIdx) => {
+              const secProgress = sectionProgressList[sIdx];
+              return (
+                <Box key={section.id}>
+                  <HStack
+                    justifyContent="space-between"
+                    alignItems="center"
+                    px="$2"
+                    py="$1"
+                    mb="$1"
+                  >
+                    <Text
+                      size="xs"
+                      fontWeight="$semibold"
+                      textTransform="uppercase"
+                      color="$textLight500"
+                      $dark-color="$textDark400"
+                    >
+                      {section.title}
+                    </Text>
+                    <Text
+                      size="xs"
+                      color="$textLight500"
+                      $dark-color="$textDark400"
+                    >
+                      {secProgress.correct} / {secProgress.total}
+                    </Text>
+                  </HStack>
+                  <VStack space="xs">
+                    {section.questions.map((question, qIdx) => {
+                      const isActive =
+                        sIdx === activeSectionIndex && qIdx === activeQuestionIndex;
+                      const ans = answeredQuestions[question.id];
 
-                    let statusIcon = "○";
-                    let statusClass = "unanswered";
+                      let statusIcon = "○";
+                      let statusColor = "$textLight400";
+                      let statusDarkColor = "$textDark500";
 
-                    if (ans) {
-                      if (ans.isCorrect) {
-                        statusIcon = "✓";
-                        statusClass = "correct";
-                      } else {
-                        statusIcon = "✗";
-                        statusClass = "incorrect";
+                      if (ans) {
+                        if (ans.isCorrect) {
+                          statusIcon = "✓";
+                          statusColor = "$success500";
+                          statusDarkColor = "$dmAccent";
+                        } else {
+                          statusIcon = "✗";
+                          statusColor = "$error500";
+                          statusDarkColor = "$error400";
+                        }
                       }
-                    }
 
-                    return (
-                      <Button
-                        key={question.id}
-                        type="button"
-                        variant="link"
-                        action="secondary"
-                        className={`mdq-sidebar-question-link ${isActive ? "active" : ""}`}
-                        onClick={() => {
-                          onSelect(sIdx, qIdx);
-                          onClose();
-                        }}
-                        onPress={() => {
-                          onSelect(sIdx, qIdx);
-                          onClose();
-                        }}
-                        style={{ justifyContent: "flex-start", paddingLeft: "0.65rem", paddingRight: "0.65rem" }}
-                      >
-                        <Text className={`mdq-status-icon ${statusClass}`}>{statusIcon}</Text>
-                        <ButtonText style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "inherit", fontWeight: isActive ? "600" : "400" }}>
-                          {qIdx + 1}. {question.title}
-                        </ButtonText>
-                      </Button>
-                    );
-                  })}
-                </VStack>
-              </Box>
-            );
-          })}
-        </Box>
+                      return (
+                        <Button
+                          key={question.id}
+                          variant="link"
+                          action="secondary"
+                          className={`mdq-sidebar-question-link ${isActive ? "active" : ""}`}
+                          onClick={() => {
+                            onSelect(sIdx, qIdx);
+                            onClose();
+                          }}
+                          onPress={() => {
+                            onSelect(sIdx, qIdx);
+                            onClose();
+                          }}
+                          bg={isActive ? "$primary100" : "transparent"}
+                          $dark-bg={isActive ? "$dmAccentSoft" : "transparent"}
+                          justifyContent="flex-start"
+                          px="$2.5"
+                          py="$2"
+                          minHeight={40}
+                          borderRadius="$md"
+                        >
+                          <Text mr="$2" color={statusColor} $dark-color={statusDarkColor}>
+                            {statusIcon}
+                          </Text>
+                          <ButtonText
+                            numberOfLines={1}
+                            color={isActive ? "$primary600" : "$textLight800"}
+                            $dark-color={isActive ? "$dmAccent" : "$textDark200"}
+                            fontWeight={isActive ? "$semibold" : "$normal"}
+                          >
+                            {qIdx + 1}. {question.title}
+                          </ButtonText>
+                        </Button>
+                      );
+                    })}
+                  </VStack>
+                </Box>
+              );
+            })}
+          </VStack>
+        </ScrollView>
 
-        <Box className="mdq-sidebar-footer">
+        <Box
+          p="$5"
+          borderTopWidth={1}
+          borderColor="$borderLight200"
+          $dark-borderColor="$borderDark700"
+          bg="$backgroundLight50"
+          $dark-bg="$backgroundDark900"
+        >
           <Progress
             total={totalQuestions}
             correct={totalCorrect}
             label="Overall Score"
           />
-          <Box style={{ display: "flex", flexDirection: "row", gap: "0.5rem", marginTop: "1rem" }}>
+          <HStack space="sm" mt="$4">
             <Button
               variant="outline"
               action="secondary"
-              type="button"
-              className="mdq-btn mdq-btn-secondary"
+              size="sm"
+              flex={1}
               onClick={onRetake}
               onPress={onRetake}
-              style={{ flex: 1, fontSize: "0.85rem", minHeight: "38px" }}
+              className="mdq-btn mdq-btn-secondary"
             >
               <ButtonText>Retake</ButtonText>
             </Button>
             <ThemeToggle />
-          </Box>
+          </HStack>
         </Box>
       </Box>
     </>

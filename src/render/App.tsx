@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Text, Heading, Button, ButtonText, Card } from "@gluestack-ui/themed";
+import {
+  Box,
+  Text,
+  Heading,
+  Button,
+  ButtonText,
+  Card,
+  ScrollView,
+  HStack,
+} from "@gluestack-ui/themed";
 import { QuizModel, Section, Question as QuestionData } from "../parse/schema.js";
 import { GluestackThemeProvider } from "./Provider.js";
 import { Sidebar } from "./Sidebar.js";
@@ -195,12 +204,21 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
         />
 
         <Box className="mdq-main" role="main">
-          <Box className="mdq-top-bar" style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            <Box className="mdq-top-bar-left" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "0.75rem" }}>
+          <HStack
+            justifyContent="space-between"
+            alignItems="center"
+            p="$4"
+            borderBottomWidth={1}
+            borderColor="$borderLight200"
+            $dark-borderColor="$borderDark700"
+            bg="$backgroundLight0"
+            $dark-bg="$backgroundDark900"
+            className="mdq-top-bar"
+          >
+            <HStack space="md" alignItems="center">
               <Button
                 variant="outline"
                 action="secondary"
-                type="button"
                 className="mdq-btn mdq-menu-toggle"
                 onClick={() => setIsDrawerOpen(true)}
                 onPress={() => setIsDrawerOpen(true)}
@@ -208,44 +226,42 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
               >
                 <ButtonText>☰</ButtonText>
               </Button>
-              <Text style={{ fontWeight: 600, fontSize: "1.05rem" }}>
-                {quizModel.title}
-              </Text>
-            </Box>
+              <Heading size="sm">{quizModel.title}</Heading>
+            </HStack>
 
-            <Box className="mdq-top-bar-right" style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
-              <Shuffle
-                isShuffled={isShuffled}
-                onToggle={() => {
-                  setIsShuffled(!isShuffled);
-                  setActiveQuestionIndex(0);
-                }}
-                noShuffle={noShuffle}
-              />
-            </Box>
-          </Box>
-
-          <Box className="mdq-content-container">
-            <SectionTabs
-              sections={quizModel.sections}
-              activeIndex={activeSectionIndex}
-              onSelect={handleSectionChange}
+            <Shuffle
+              isShuffled={isShuffled}
+              onToggle={() => {
+                setIsShuffled(!isShuffled);
+                setActiveQuestionIndex(0);
+              }}
+              noShuffle={noShuffle}
             />
+          </HStack>
 
-            {currentQuestion ? (
-              <Question
-                key={currentQuestion.id}
-                question={currentQuestion}
-                sectionTitle={quizModel.sections.length > 1 ? currentSection.title : undefined}
-                questionIndex={activeQuestionIndex}
-                totalInSection={displayedQuestions.length}
-                savedAnswer={answeredQuestions[currentQuestion.id]}
-                onAnswer={handleAnswerQuestion}
+          <ScrollView flex={1}>
+            <Box maxW={820} w="100%" mx="auto" p="$6" pb="$24" className="mdq-content-container">
+              <SectionTabs
+                sections={quizModel.sections}
+                activeIndex={activeSectionIndex}
+                onSelect={handleSectionChange}
               />
-            ) : (
-              <Text>No questions found in this section.</Text>
-            )}
-          </Box>
+
+              {currentQuestion ? (
+                <Question
+                  key={currentQuestion.id}
+                  question={currentQuestion}
+                  sectionTitle={quizModel.sections.length > 1 ? currentSection.title : undefined}
+                  questionIndex={activeQuestionIndex}
+                  totalInSection={displayedQuestions.length}
+                  savedAnswer={answeredQuestions[currentQuestion.id]}
+                  onAnswer={handleAnswerQuestion}
+                />
+              ) : (
+                <Text>No questions found in this section.</Text>
+              )}
+            </Box>
+          </ScrollView>
 
           <Stepper
             current={activeQuestionIndex}
@@ -258,15 +274,14 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
         </Box>
 
         {showRetakeModal && (
-          <Box className="mdq-modal-backdrop" onClick={() => setShowRetakeModal(false)}>
+          <Box className="mdq-modal-backdrop" bg="rgba(0, 0, 0, 0.5)" p="$5" onClick={() => setShowRetakeModal(false)}>
             <Card variant="elevated" p="$6" maxW={440} w="100%" onClick={(e: any) => e?.stopPropagation?.()}>
               <Heading size="md" mb="$2">Retake Quiz</Heading>
               <Text mb="$4">Would you like to reset your progress for the current section or the entire quiz?</Text>
-              <Box style={{ display: "flex", flexDirection: "row", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <HStack space="md" justifyContent="flex-end">
                 <Button
                   variant="link"
                   action="secondary"
-                  type="button"
                   onClick={() => setShowRetakeModal(false)}
                   onPress={() => setShowRetakeModal(false)}
                 >
@@ -275,7 +290,6 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                 <Button
                   variant="outline"
                   action="secondary"
-                  type="button"
                   onClick={handleResetSection}
                   onPress={handleResetSection}
                 >
@@ -284,13 +298,12 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
                 <Button
                   variant="solid"
                   action="negative"
-                  type="button"
                   onClick={handleResetAll}
                   onPress={handleResetAll}
                 >
                   <ButtonText>Reset All</ButtonText>
                 </Button>
-              </Box>
+              </HStack>
             </Card>
           </Box>
         )}
