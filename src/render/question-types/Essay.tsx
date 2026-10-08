@@ -14,6 +14,11 @@ import {
   BadgeText,
   VStack,
   HStack,
+  Checkbox,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  CheckIcon,
 } from "@gluestack-ui/themed";
 
 export interface EssayProps {
@@ -154,6 +159,7 @@ export const Essay: React.FC<EssayProps> = ({
             </Text>
 
             <Button
+              size="md"
               variant="solid"
               action="primary"
               onClick={handleCheckAndReview}
@@ -171,6 +177,7 @@ export const Essay: React.FC<EssayProps> = ({
               <BadgeText>Concept Coverage: {conceptMatch.coveragePercent}%</BadgeText>
             </Badge>
             <Button
+              size="sm"
               variant="outline"
               action="secondary"
               onClick={handleEditEssay}
@@ -218,16 +225,21 @@ export const Essay: React.FC<EssayProps> = ({
             {rubric.length > 0 ? (
               <VStack space="md">
                 {rubric.map((criterion, idx) => (
-                  <HStack key={idx} space="sm" alignItems="center">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(checkedRubric[idx])}
-                      disabled={disabled}
-                      onChange={() => handleToggleCriterion(idx)}
-                      style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
-                    />
-                    <Text size="sm">{criterion}</Text>
-                  </HStack>
+                  <Checkbox
+                    key={idx}
+                    value={`criterion-${idx}`}
+                    size="md"
+                    isChecked={Boolean(checkedRubric[idx])}
+                    onChange={() => handleToggleCriterion(idx)}
+                    isDisabled={disabled}
+                  >
+                    <CheckboxIndicator mr="$3">
+                      <CheckboxIcon as={CheckIcon} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel size="sm">
+                      {criterion}
+                    </CheckboxLabel>
+                  </Checkbox>
                 ))}
               </VStack>
             ) : (
@@ -239,6 +251,7 @@ export const Essay: React.FC<EssayProps> = ({
 
           <HStack mt="$4" mb="$3">
             <Button
+              size="md"
               variant="outline"
               action="secondary"
               onClick={handleEditEssay}

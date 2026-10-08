@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
 import {
-  Box,
-  Text,
+  CheckboxGroup,
+  Checkbox,
+  CheckboxIndicator,
+  CheckboxIcon,
+  CheckboxLabel,
+  CheckIcon,
+  Card,
   Button,
   ButtonText,
-  Pressable,
-  HStack,
-  Card,
   Heading,
+  Box,
+  VStack,
 } from "@gluestack-ui/themed";
 
 export interface MultiSelectProps {
@@ -34,11 +38,15 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
   const options = question.options || [];
 
-  const handleToggle = (id: string) => {
+  const handleToggle = (id: string, nextState?: boolean) => {
     if (isLocked || disabled) return;
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    const shouldSelect = typeof nextState === "boolean" ? nextState : !selectedIds.includes(id);
+    setSelectedIds((prev) => {
+      const exists = prev.includes(id);
+      if (shouldSelect && !exists) return [...prev, id];
+      if (!shouldSelect && exists) return prev.filter((item) => item !== id);
+      return prev;
+    });
   };
 
   const handleCheck = () => {
@@ -54,57 +62,56 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
   return (
     <Box>
-      <Box mb="$5" role="group" aria-label={question.title}>
-        {options.map((opt) => {
-          const isSelected = selectedIds.includes(opt.id);
-          let borderColor = isSelected ? "$primary500" : "$borderLight200";
-          let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
+      <CheckboxGroup value={selectedIds} onChange={setSelectedIds} isDisabled={isLocked || disabled} mb="$6">
+        <VStack space="md">
+          {options.map((opt) => {
+            const isSelected = selectedIds.includes(opt.id);
+            let borderColor = isSelected ? "$primary500" : "$borderLight200";
+            let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
 
-          if (isLocked) {
-            if (opt.isCorrect) {
-              borderColor = "$primary500";
-              bgColor = "$primary100";
-            } else if (isSelected && !opt.isCorrect) {
-              borderColor = "$borderDark700";
-              bgColor = "$backgroundLight100";
+            if (isLocked) {
+              if (opt.isCorrect) {
+                borderColor = "$success500";
+                bgColor = "$primary100";
+              } else if (isSelected && !opt.isCorrect) {
+                borderColor = "$error500";
+                bgColor = "$backgroundLight100";
+              }
             }
-          }
 
-          return (
-            <Pressable
-              key={opt.id}
-              p="$4"
-              mb="$3"
-              borderWidth={1}
-              borderRadius="$xl"
-              borderColor={borderColor}
-              bg={bgColor}
-              disabled={isLocked || disabled}
-              onPress={() => handleToggle(opt.id)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isSelected }}
-            >
-              <HStack space="md" alignItems="center">
-                <input
-                  type="checkbox"
-                  name={`ms-${question.id}-${opt.id}`}
+            return (
+              <Card
+                key={opt.id}
+                variant="outline"
+                p="$4"
+                borderRadius="$xl"
+                borderColor={borderColor}
+                bg={bgColor}
+                $dark-bg={isSelected ? "$dmAccentSoft" : "$backgroundDark900"}
+              >
+                <Checkbox
                   value={opt.id}
-                  checked={isSelected}
-                  disabled={isLocked || disabled}
+                  size="md"
+                  isChecked={isSelected}
                   onChange={() => handleToggle(opt.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
-                />
-                <Text fontWeight={isSelected ? "600" : "400"}>{opt.text}</Text>
-              </HStack>
-            </Pressable>
-          );
-        })}
-      </Box>
+                  isDisabled={isLocked || disabled}
+                >
+                  <CheckboxIndicator mr="$3">
+                    <CheckboxIcon as={CheckIcon} />
+                  </CheckboxIndicator>
+                  <CheckboxLabel fontWeight={isSelected ? "$semibold" : "$normal"}>
+                    {opt.text}
+                  </CheckboxLabel>
+                </Checkbox>
+              </Card>
+            );
+          })}
+        </VStack>
+      </CheckboxGroup>
 
       {!isLocked && (
         <Button
-          mt="$2"
+          size="md"
           variant="solid"
           action="primary"
           onClick={handleCheck}

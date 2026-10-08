@@ -266,7 +266,7 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
           </HStack>
 
           <ScrollView flex={1}>
-            <Box maxW={820} w="100%" mx="auto" p="$6" pb="$24">
+            <Box maxW={820} w="100%" mx="auto" px="$6" py="$8">
               <SectionTabs
                 sections={quizModel.sections}
                 activeIndex={activeSectionIndex}

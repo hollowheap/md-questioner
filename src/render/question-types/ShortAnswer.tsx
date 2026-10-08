@@ -104,7 +104,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
 
       {!isLocked && (
         <Button
-          mt="$2"
+          size="md"
           variant="solid"
           action="primary"
           onClick={handleSubmit}

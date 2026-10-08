@@ -206,8 +206,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           bg={isActive ? "$primary100" : "transparent"}
                           $dark-bg={isActive ? "$dmAccentSoft" : "transparent"}
                           justifyContent="flex-start"
-                          px="$2.5"
-                          py="$2"
+                          px="$3"
+                          py="$2.5"
                           minHeight={40}
                           borderRadius="$md"
                         >

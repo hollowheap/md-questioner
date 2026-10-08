@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
 import {
-  Box,
-  Text,
+  RadioGroup,
+  Radio,
+  RadioIndicator,
+  RadioIcon,
+  RadioLabel,
+  CircleIcon,
+  Card,
   Button,
   ButtonText,
-  Pressable,
-  HStack,
-  Card,
   Heading,
+  Box,
+  VStack,
 } from "@gluestack-ui/themed";
 
 export interface MultiChoiceProps {
@@ -49,56 +53,48 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
 
   return (
     <Box>
-      <Box mb="$5" role="radiogroup" aria-label={question.title}>
-        {options.map((opt) => {
-          const isSelected = selectedId === opt.id;
-          let borderColor = isSelected ? "$primary500" : "$borderLight200";
-          let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
-
-          if (isLocked) {
-            if (opt.isCorrect) {
-              borderColor = "$primary500";
-              bgColor = "$primary100";
-            } else if (isSelected && !opt.isCorrect) {
-              borderColor = "$borderDark700";
-              bgColor = "$backgroundLight100";
+      <RadioGroup value={selectedId} onChange={handleSelect} isDisabled={isLocked || disabled} mb="$6">
+        <VStack space="md">
+          {options.map((opt) => {
+            const isSelected = selectedId === opt.id;
+            let borderColor = isSelected ? "$primary500" : "$borderLight200";
+            let bgColor = isSelected ? "$primary100" : "$backgroundLight0";
+            if (isLocked) {
+              if (opt.isCorrect) {
+                borderColor = "$success500";
+                bgColor = "$primary100";
+              } else if (isSelected && !opt.isCorrect) {
+                borderColor = "$error500";
+                bgColor = "$backgroundLight100";
+              }
             }
-          }
-
-          return (
-            <Pressable
-              key={opt.id}
-              p="$4"
-              mb="$3"
-              borderWidth={1}
-              borderRadius="$xl"
-              borderColor={borderColor}
-              bg={bgColor}
-              disabled={isLocked || disabled}
-              onPress={() => handleSelect(opt.id)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: isSelected }}
-            >
-              <HStack space="md" alignItems="center">
-                <input
-                  type="radio"
-                  name={`mc-${question.id}`}
-                  value={opt.id}
-                  checked={isSelected}
-                  disabled={isLocked || disabled}
-                  onChange={() => handleSelect(opt.id)}
-                  style={{ width: "1.1rem", height: "1.1rem", cursor: "pointer" }}
-                />
-                <Text fontWeight={isSelected ? "600" : "400"}>{opt.text}</Text>
-              </HStack>
-            </Pressable>
-          );
-        })}
-      </Box>
+            return (
+              <Card
+                key={opt.id}
+                variant="outline"
+                p="$4"
+                borderRadius="$xl"
+                borderColor={borderColor}
+                bg={bgColor}
+                $dark-bg={isSelected ? "$dmAccentSoft" : "$backgroundDark900"}
+              >
+                <Radio value={opt.id} size="md" isDisabled={isLocked || disabled}>
+                  <RadioIndicator mr="$3">
+                    <RadioIcon as={CircleIcon} />
+                  </RadioIndicator>
+                  <RadioLabel fontWeight={isSelected ? "$semibold" : "$normal"}>
+                    {opt.text}
+                  </RadioLabel>
+                </Radio>
+              </Card>
+            );
+          })}
+        </VStack>
+      </RadioGroup>
 
       {!isLocked && (
         <Button
-          mt="$2"
+          size="md"
           variant="solid"
           action="primary"
           onClick={handleCheck}

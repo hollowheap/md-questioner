@@ -68,6 +68,7 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
     return (
       <Button
         key={opt.id}
+        size="lg"
         flex={1}
         minHeight={52}
         p="$3"
@@ -85,14 +86,14 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 
   return (
     <Box>
-      <HStack space="md" mb="$5">
+      <HStack space="md" mb="$6">
         {renderButton(trueOption, "True")}
         {renderButton(falseOption, "False")}
       </HStack>
 
       {!isLocked && (
         <Button
-          mt="$2"
+          size="md"
           variant="solid"
           action="primary"
           onClick={handleCheck}

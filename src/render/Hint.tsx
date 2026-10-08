@@ -1,34 +1,46 @@
-import React, { useState } from "react";
-import { Box, Button, ButtonText, Card, Text } from "@gluestack-ui/themed";
+import React from "react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionHeader,
+  AccordionTrigger,
+  AccordionTitleText,
+  AccordionIcon,
+  AccordionContent,
+  AccordionContentText,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from "@gluestack-ui/themed";
 
 export interface HintProps {
   hint?: string;
 }
 
 export const Hint: React.FC<HintProps> = ({ hint }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   if (!hint) {
     return null;
   }
 
   return (
-    <Box mb="$4">
-      <Button
-        size="sm"
-        variant="outline"
-        action="secondary"
-        onPress={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-      >
-        <ButtonText>Hint: {isOpen ? "Hide" : "Show"}</ButtonText>
-      </Button>
-      {isOpen && (
-        <Card variant="outline" mt="$2" p="$3">
-          <Text>{hint}</Text>
-        </Card>
-      )}
-    </Box>
+    <Accordion width="100%" size="sm" variant="unfilled" type="multiple" mb="$5">
+      <AccordionItem value="hint">
+        <AccordionHeader>
+          <AccordionTrigger>
+            {({ isExpanded }: { isExpanded: boolean }) => (
+              <>
+                <AccordionTitleText size="sm" fontWeight="$medium">
+                  Hint: {isExpanded ? "Hide" : "Show"}
+                </AccordionTitleText>
+                <AccordionIcon as={isExpanded ? ChevronUpIcon : ChevronDownIcon} ml="$2" />
+              </>
+            )}
+          </AccordionTrigger>
+        </AccordionHeader>
+        <AccordionContent pt="$2" pb="$1">
+          <AccordionContentText size="sm">{hint}</AccordionContentText>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 

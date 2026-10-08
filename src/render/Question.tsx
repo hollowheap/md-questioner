@@ -100,8 +100,8 @@ export const Question: React.FC<QuestionProps> = ({
   };
 
   return (
-    <Card variant="outline" p="$6" mb="$6" data-question-id={question.id}>
-      <Box mb="$3">
+    <Card variant="outline" p="$6" mb="$6" borderRadius="$2xl" data-question-id={question.id}>
+      <Box mb="$2">
         <Text size="xs" color="$textLight500" $dark-color="$textDark400">
           {sectionTitle ? `${sectionTitle} • ` : ""}Question {questionIndex + 1} of {totalInSection}
         </Text>
@@ -111,13 +111,13 @@ export const Question: React.FC<QuestionProps> = ({
 
       {question.promptHtml && (
         <Box
-          mb="$5"
+          mb="$6"
           dangerouslySetInnerHTML={{ __html: question.promptHtml }}
         />
       )}
 
       {question.hint && (
-        <Box mb="$5">
+        <Box mb="$6">
           <Hint hint={question.hint} />
         </Box>
       )}
