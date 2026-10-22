@@ -121,6 +121,60 @@ describe("Question type detection rules", () => {
   });
 });
 
+describe("Images are not supported", () => {
+  it("renders Markdown image syntax as an alt-text note without an <img> element", () => {
+    const md = `# Quiz\n\n### Diagram question\n\n![Architecture diagram](https://example.com/diagram.png)\n\nSome prose.`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("<img");
+    expect(q.promptHtml).not.toContain("example.com");
+    expect(q.promptHtml).toContain("Architecture diagram");
+  });
+
+  it("replaces raw <img> tags with their alt text", () => {
+    const md = `# Quiz\n\n### Raw image question\n\n<img src="https://example.com/photo.png" alt="Photo of the setup">\n\nMore prose.`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("<img");
+    expect(q.promptHtml).not.toContain("example.com");
+    expect(q.promptHtml).toContain("Photo of the setup");
+  });
+
+  it("strips raw HTML that could load external assets or run handlers", () => {
+    const md = `# Quiz\n\n### Unsafe HTML\n\n<iframe src="https://example.com/frame"></iframe>\n\n<script src="https://example.com/s.js"></script>\n\n<div style="background:url(https://example.com/bg.png)" onclick="alert(1)">text</div>\n\nMore prose.`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("<iframe");
+    expect(q.promptHtml).not.toContain("<script");
+    expect(q.promptHtml).not.toContain("</script>");
+    expect(q.promptHtml).not.toContain("onclick");
+    expect(q.promptHtml).not.toContain("example.com");
+    expect(q.promptHtml).toContain("text");
+  });
+
+  it("strips unclosed dangerous elements without leaking their body", () => {
+    const md = `# Quiz\n\n### Unclosed HTML\n\n<script src="https://example.com/x.js">\n\n<style>@import url("https://example.com/s.css");</style>\n\nProse tail.`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("<script");
+    expect(q.promptHtml).not.toContain("</script>");
+    expect(q.promptHtml).not.toContain("@import");
+    expect(q.promptHtml).not.toContain("example.com");
+    expect(q.promptHtml).toContain("Prose tail.");
+  });
+
+  it("leaves escaped raw HTML inside fenced code blocks untouched", () => {
+    const md = "### Code included\n\n``````html\n<iframe src=\"https://example.com/frame\"></iframe>\n``````\n\nProse.";
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).toContain("pre");
+    expect(q.promptHtml).toContain('class="hljs language-html"');
+    expect(q.promptHtml).toContain("&lt;");
+    expect(q.promptHtml).toContain("iframe");
+    expect(q.promptHtml).not.toContain("<iframe");
+  });
+});
+
 describe("Hint extraction vs prose blockquotes", () => {
   it("treats first blockquote as hint and subsequent blockquote as prompt prose", () => {
     const md = `# Quiz\n\n### Question with hints\n\n> This is the hint.\n\nSome prompt text.\n\n> This is prose in the prompt.\n\n- [x] Option 1\n- [ ] Option 2`;
