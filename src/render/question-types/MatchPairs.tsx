@@ -2,15 +2,6 @@ import React, { useMemo, useState } from "react";
 import { Question } from "../../parse/schema.js";
 import { MarkdownView } from "../MarkdownView.js";
 import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicatorWrapper,
-  SelectDragIndicator,
-  SelectItem,
   HStack,
   VStack,
   Card,
@@ -20,6 +11,7 @@ import {
   Box,
   Text,
 } from "@gluestack-ui/themed";
+import { Select } from "../Select.js";
 
 export interface MatchPairsProps {
   question: Question;
@@ -88,27 +80,18 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
             <Card key={pair.prompt} variant="outline" p="$5" mb="$4" borderRadius="$2xl">
               <HStack justifyContent="space-between" alignItems="center" space="md">
                 <Text flex={1} fontWeight="$medium">{pair.prompt}</Text>
-                <Box flex={1} maxW={280}>
+                <Box flex={1} style={{ maxWidth: 280 }}>
                   <Select
-                    selectedValue={selectedAnswer}
-                    onValueChange={(val: string) => handleChange(pair.prompt, val)}
-                    isDisabled={isLocked || disabled}
-                  >
-                    <SelectTrigger variant="outline" size="md">
-                      <SelectInput placeholder="Select match..." />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {shuffledAnswers.map((ans, aIdx) => (
-                          <SelectItem key={`${ans}-${aIdx}`} label={ans} value={ans} />
-                        ))}
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
+                    value={selectedAnswer}
+                    options={shuffledAnswers.map((answer) => ({
+                      label: answer,
+                      value: answer,
+                    }))}
+                    onChange={(val) => handleChange(pair.prompt, val)}
+                    placeholder="Select match..."
+                    disabled={isLocked || disabled}
+                    label={`Match for ${pair.prompt}`}
+                  />
                   {isRowIncorrect && (
                     <Text size="sm" color="$error500" mt="$1">
                       Correct: {pair.answer}
@@ -123,6 +106,9 @@ export const MatchPairs: React.FC<MatchPairsProps> = ({
 
       {!isLocked && (
         <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={!allSelected || disabled ? "disabled" : "enabled"}
           size="md"
           variant="solid"
           action="primary"

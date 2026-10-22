@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Text, Card } from "@gluestack-ui/themed";
+import { Box, Heading, Text } from "@gluestack-ui/themed";
 import { Question as QuestionData } from "../parse/schema.js";
 import { Hint } from "./Hint.js";
 import { MarkdownView } from "./MarkdownView.js";
@@ -10,6 +10,7 @@ import { MatchPairs } from "./question-types/MatchPairs.js";
 import { ShortAnswer } from "./question-types/ShortAnswer.js";
 import { Reflection } from "./question-types/Reflection.js";
 import { Essay } from "./question-types/Essay.js";
+import type { KeyboardSelection } from "./shortcuts.js";
 
 export interface QuestionProps {
   question: QuestionData;
@@ -20,6 +21,8 @@ export interface QuestionProps {
     isCorrect: boolean;
     userResponse: unknown;
   };
+  /** Digit shortcut resolved to an option index for the active question. */
+  keyboardSelection?: KeyboardSelection | null;
   onAnswer?: (response: unknown, isCorrect: boolean) => void;
   disabled?: boolean;
 }
@@ -30,6 +33,7 @@ export const Question: React.FC<QuestionProps> = ({
   questionIndex = 0,
   totalInSection = 1,
   savedAnswer,
+  keyboardSelection,
   onAnswer,
   disabled = false,
 }) => {
@@ -44,6 +48,7 @@ export const Question: React.FC<QuestionProps> = ({
           <MultiChoice
             question={question}
             savedAnswer={savedAnswer}
+            keyboardSelection={keyboardSelection}
             onAnswer={handleAnswer}
           />
         );
@@ -52,6 +57,7 @@ export const Question: React.FC<QuestionProps> = ({
           <MultiSelect
             question={question}
             savedAnswer={savedAnswer}
+            keyboardSelection={keyboardSelection}
             onAnswer={handleAnswer}
           />
         );
@@ -60,6 +66,7 @@ export const Question: React.FC<QuestionProps> = ({
           <TrueFalse
             question={question}
             savedAnswer={savedAnswer}
+            keyboardSelection={keyboardSelection}
             onAnswer={handleAnswer}
           />
         );
@@ -101,18 +108,13 @@ export const Question: React.FC<QuestionProps> = ({
   };
 
   return (
-    <Card
-      variant="outline"
-      p="$8"
+    <Box
       mb="$8"
       borderRadius="$md"
-      borderColor="$borderLight200"
-      $dark-borderColor="$borderDark700"
       bg="$backgroundLight0"
       $dark-bg="$backgroundDark900"
-      data-question-id={question.id}
     >
-      <Box mb="$3">
+      <Box mb="$4">
         <Text size="sm" color="$textLight500" $dark-color="$textDark400">
           {sectionTitle ? `${sectionTitle} • ` : ""}Question {questionIndex + 1} of {totalInSection}
         </Text>
@@ -127,15 +129,15 @@ export const Question: React.FC<QuestionProps> = ({
       )}
 
       {question.hint && (
-        <Box mb="$6">
+        <Box mb="$5">
           <Hint hint={question.hint} />
         </Box>
       )}
 
-      <Box mt="$6">
+      <Box mt="$5">
         {renderQuestionBody()}
       </Box>
-    </Card>
+    </Box>
   );
 };
 

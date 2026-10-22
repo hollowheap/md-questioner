@@ -12,6 +12,9 @@ import {
 import { Section } from "../parse/schema.js";
 import { Progress } from "./Progress.js";
 import { ThemeToggle } from "./ThemeToggle.js";
+import { motion } from "motion/react";
+import { transitions } from "./motion.js";
+import { CheckGlyph, CrossGlyph, PendingGlyph } from "./icons.js";
 
 export interface SidebarProps {
   quizTitle: string;
@@ -20,8 +23,7 @@ export interface SidebarProps {
   activeSectionIndex: number;
   activeQuestionIndex: number;
   answeredQuestions: Record<string, { isCorrect: boolean; userResponse: unknown }>;
-  isOpen: boolean;
-  onClose: () => void;
+  isCollapsed?: boolean;
   onSelect: (sectionIdx: number, questionIdx: number) => void;
   onRetake: () => void;
 }
@@ -33,21 +35,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeSectionIndex,
   activeQuestionIndex,
   answeredQuestions,
-  isOpen,
-  onClose,
+  isCollapsed = false,
   onSelect,
   onRetake,
 }) => {
-  const [isMobile, setIsMobile] = React.useState<boolean>(() => {
-    if (typeof window !== "undefined") return window.innerWidth < 1024;
-    return false;
-  });
-  React.useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-
   let totalQuestions = 0;
   let totalCorrect = 0;
 
@@ -69,102 +60,102 @@ export const Sidebar: React.FC<SidebarProps> = ({
   });
 
   return (
-    <>
-      {isMobile && isOpen && (
+    <motion.aside
+      initial={false}
+      animate={{ x: 0 }}
+      transition={transitions.drawer}
+      aria-label="Quiz Navigation"
+      role="complementary"
+      style={{
+        width: isCollapsed ? 64 : 280,
+        flexShrink: 0,
+        position: "relative",
+        height: "100%",
+      }}
+    >
         <Box
-          position="fixed"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          bg="rgba(0, 0, 0, 0.45)"
-          zIndex={999}
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-      <Box
-        data-testid="mdq-sidebar"
-        testID="mdq-sidebar"
-        position={isMobile ? "fixed" : "sticky"}
-        top={0}
-        {...(isMobile
-          ? { left: 0, bottom: 0, zIndex: 1000 }
-          : { h: "100vh", flexShrink: 0 })}
-        w={280}
-        transform={isMobile ? (isOpen ? "translateX(0)" : "translateX(-100%)") : undefined}
-        bg="$backgroundLight50"
-        $dark-bg="$backgroundDark900"
-        borderRightWidth={1}
-        borderColor="$borderLight200"
-        $dark-borderColor="$borderDark700"
-        aria-label="Quiz Navigation"
-        role="complementary"
-      >
+          data-testid="mdq-sidebar"
+          testID="mdq-sidebar"
+          display="flex"
+          flexDirection="column"
+          h="100%"
+          w="100%"
+          overflow="hidden"
+          bg="$backgroundLight50"
+          $dark-bg="$backgroundDark900"
+          borderRightWidth={1}
+          borderColor="$borderLight200"
+          $dark-borderColor="$borderDark700"
+        >
         <Box
-          p="$6"
+          p={isCollapsed ? "$2" : "$5"}
           borderBottomWidth={1}
           borderColor="$borderLight200"
           $dark-borderColor="$borderDark700"
         >
-          <HStack justifyContent="space-between" alignItems="flex-start">
-            <Heading size="md">
-              {quizTitle}
-            </Heading>
-            {isMobile && isOpen && (
-              <Button
-                size="sm"
-                variant="link"
-                action="secondary"
-                onClick={onClose}
-                onPress={onClose}
-                aria-label="Close navigation drawer"
-              >
-                <ButtonText>Close</ButtonText>
-              </Button>
-            )}
-          </HStack>
-          {quizDescription && (
+          {isCollapsed ? (
             <Text
-              mt="$1"
               size="sm"
-              color="$textLight500"
-              $dark-color="$textDark400"
+              fontWeight="$semibold"
+              textAlign="center"
+              color="$textLight600"
+              $dark-color="$textDark300"
+              aria-hidden
             >
-              {quizDescription}
+              {quizTitle.charAt(0).toUpperCase()}
             </Text>
+          ) : (
+            <>
+              <HStack justifyContent="space-between" alignItems="flex-start">
+                <Heading size="md">
+                  {quizTitle}
+                </Heading>
+              </HStack>
+              {quizDescription && (
+                <Text
+                  mt="$1"
+                  size="sm"
+                  color="$textLight500"
+                  $dark-color="$textDark400"
+                >
+                  {quizDescription}
+                </Text>
+              )}
+            </>
           )}
         </Box>
 
-        <ScrollView flex={1} p="$3" role="navigation" aria-label="Quiz Sections">
+        <ScrollView flex={1} p={isCollapsed ? "$2" : "$4"} role="navigation" aria-label="Quiz Sections">
           <VStack space="md">
             {sections.map((section, sIdx) => {
               const secProgress = sectionProgressList[sIdx];
               return (
                 <Box key={section.id}>
                   <HStack
-                    justifyContent="space-between"
+                    justifyContent={isCollapsed ? "center" : "space-between"}
                     alignItems="center"
-                    px="$2"
+                    px={isCollapsed ? "$0" : "$2"}
                     py="$1"
                     mb="$1"
                   >
                     <Text
-                      size="sm"
+                      size={isCollapsed ? "xs" : "sm"}
                       fontWeight="$semibold"
                       textTransform="uppercase"
                       color="$textLight500"
                       $dark-color="$textDark400"
                     >
-                      {section.title}
+                      {isCollapsed ? section.title.charAt(0) : section.title}
                     </Text>
-                    <Text
-                      size="sm"
-                      color="$textLight500"
-                      $dark-color="$textDark400"
-                    >
-                      {secProgress.correct} / {secProgress.total}
-                    </Text>
+                    {!isCollapsed && (
+                      <Text
+                        size="sm"
+                        color="$textLight500"
+                        $dark-color="$textDark400"
+                      >
+                        {secProgress.correct} / {secProgress.total}
+                      </Text>
+                    )}
                   </HStack>
                   <VStack space="sm">
                     {section.questions.map((question, qIdx) => {
@@ -174,14 +165,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                       let statusColor = "$textLight400";
                       let statusDarkColor = "$textDark500";
+                      let statusLabel = "Not answered";
 
                       if (ans) {
                         if (ans.isCorrect) {
                           statusColor = "$success500";
                           statusDarkColor = "$dmAccent";
+                          statusLabel = "Answered correctly";
                         } else {
                           statusColor = "$error500";
                           statusDarkColor = "$error400";
+                          statusLabel = "Answered incorrectly";
                         }
                       }
 
@@ -192,30 +186,58 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           action="secondary"
                           onClick={() => {
                             onSelect(sIdx, qIdx);
-                            onClose();
                           }}
                           onPress={() => {
                             onSelect(sIdx, qIdx);
-                            onClose();
                           }}
                           bg={isActive ? "$primary100" : "transparent"}
                           $dark-bg={isActive ? "$dmAccentSoft" : "transparent"}
-                          justifyContent="flex-start"
-                          px="$4"
-                          py="$3"
-                          minHeight={46}
-                          borderRadius="$xl"
+                          justifyContent={isCollapsed ? "center" : "flex-start"}
+                          px={isCollapsed ? "$1" : "$4"}
+                          py={isCollapsed ? "$2" : "$3"}
+                          minHeight={isCollapsed ? 32 : 46}
+                          borderRadius={isCollapsed ? "$md" : "$xl"}
+                          aria-label={
+                            isCollapsed
+                              ? `Question ${qIdx + 1}: ${question.title}`
+                              : undefined
+                          }
                         >
+                        {isCollapsed ? (
+                          <span
+                            role="img"
+                            aria-label={statusLabel}
+                            style={{
+                              marginRight: 6,
+                              color: ans
+                                ? ans.isCorrect
+                                  ? "var(--color-success)"
+                                  : "var(--color-error)"
+                                : "var(--color-muted)",
+                            }}
+                          >
+                            {ans ? (
+                              ans.isCorrect ? (
+                                <CheckGlyph size={12} />
+                              ) : (
+                                <CrossGlyph size={12} />
+                              )
+                            ) : (
+                              <PendingGlyph size={12} />
+                            )}
+                          </span>
+                        ) : (
                           <Text mr="$3" color={statusColor} $dark-color={statusDarkColor}>
                             •
                           </Text>
+                        )}
                           <ButtonText
                             numberOfLines={1}
                             color={isActive ? "$primary600" : "$textLight800"}
                             $dark-color={isActive ? "$dmAccent" : "$textDark200"}
                             fontWeight={isActive ? "$semibold" : "$normal"}
                           >
-                            {qIdx + 1}. {question.title}
+                            {isCollapsed ? qIdx + 1 : `${qIdx + 1}. ${question.title}`}
                           </ButtonText>
                         </Button>
                       );
@@ -228,34 +250,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </ScrollView>
 
         <Box
-          p="$6"
+          p={isCollapsed ? "$2" : "$6"}
           borderTopWidth={1}
           borderColor="$borderLight200"
           $dark-borderColor="$borderDark700"
           bg="$backgroundLight50"
           $dark-bg="$backgroundDark900"
         >
-          <Progress
-            total={totalQuestions}
-            correct={totalCorrect}
-            label="Overall Score"
-          />
-          <HStack space="sm" mt="$4">
-            <Button
-              size="sm"
-              variant="outline"
-              action="secondary"
-              flex={1}
-              onClick={onRetake}
-              onPress={onRetake}
-            >
-              <ButtonText>Retake</ButtonText>
-            </Button>
-            <ThemeToggle />
-          </HStack>
+          {!isCollapsed && (
+            <>
+              <Progress
+                total={totalQuestions}
+                correct={totalCorrect}
+                label="Overall Score"
+              />
+              <HStack space="sm" mt="$4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  action="secondary"
+                  flex={1}
+                  onClick={onRetake}
+                  onPress={onRetake}
+                >
+                  <ButtonText>Retake</ButtonText>
+                </Button>
+                <ThemeToggle />
+              </HStack>
+            </>
+          )}
         </Box>
-      </Box>
-    </>
+        </Box>
+    </motion.aside>
   );
 };
 

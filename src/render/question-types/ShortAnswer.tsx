@@ -3,7 +3,6 @@ import { Question } from "../../parse/schema.js";
 import { MarkdownView } from "../MarkdownView.js";
 import {
   Input,
-  InputField,
   Button,
   ButtonText,
   Box,
@@ -11,6 +10,7 @@ import {
   Card,
   Heading,
 } from "@gluestack-ui/themed";
+import { InputFieldEx } from "../themed-aliases.js";
 
 function levenshtein(a: string, b: string): number {
   const m = a.length;
@@ -67,7 +67,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
     onAnswer?.(trimmed, isCorrect);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<any>) => {
+  const handleKeyDown = (e: any) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSubmit();
@@ -86,7 +86,7 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
           isInvalid={isLocked && !isCorrect}
           isDisabled={isLocked || disabled}
         >
-          <InputField
+          <InputFieldEx
             type="text"
             placeholder="Type your answer here..."
             value={value}
@@ -105,6 +105,9 @@ export const ShortAnswer: React.FC<ShortAnswerProps> = ({
 
       {!isLocked && (
         <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={!value.trim() || disabled ? "disabled" : "enabled"}
           size="md"
           variant="solid"
           action="primary"

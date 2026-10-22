@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Progress as GProgress,
-  ProgressFilledTrack,
-} from "@gluestack-ui/themed";
+import { Box, VStack, HStack, Text } from "@gluestack-ui/themed";
 
 export interface SectionProgressData {
   id: string;
@@ -22,6 +15,37 @@ export interface ProgressProps {
   label?: string;
   sections?: SectionProgressData[];
 }
+
+interface ProgressBarProps {
+  value: number;
+  label: string;
+  size?: "sm" | "md";
+}
+
+/** Own progressbar: Gluestack's Progress emits an unsupported aria-orientation. */
+const ProgressBar: React.FC<ProgressBarProps> = ({ value, label, size = "md" }) => (
+  <Box
+    role="progressbar"
+    aria-label={label}
+    aria-valuenow={value}
+    aria-valuemin={0}
+    aria-valuemax={100}
+    width="100%"
+    height={size === "sm" ? "4px" : "6px"}
+    borderRadius="full"
+    overflow="hidden"
+    bg="$borderLight200"
+    $dark-bg="$borderDark700"
+  >
+    <Box
+      width={`${value}%`}
+      height="100%"
+      borderRadius="full"
+      bg="$primary500"
+      $dark-bg="$dmAccent"
+    />
+  </Box>
+);
 
 export const Progress: React.FC<ProgressProps> = ({
   answered = 0,
@@ -43,14 +67,7 @@ export const Progress: React.FC<ProgressProps> = ({
           {currentCount} / {total} ({pct}%)
         </Text>
       </HStack>
-      <GProgress value={pct} size="md">
-        <ProgressFilledTrack
-          role="progressbar"
-          aria-valuenow={pct}
-          aria-valuemin={0}
-          aria-valuemax={100}
-        />
-      </GProgress>
+      <ProgressBar value={pct} label={label} />
 
       {sections && sections.length > 1 && (
         <VStack space="sm" mt="$4">
@@ -66,14 +83,7 @@ export const Progress: React.FC<ProgressProps> = ({
                     {sec.correct}/{sec.total}
                   </Text>
                 </HStack>
-                <GProgress value={secPct} size="sm">
-                  <ProgressFilledTrack
-                    role="progressbar"
-                    aria-valuenow={secPct}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                  />
-                </GProgress>
+                <ProgressBar value={secPct} label={sec.title} />
               </Box>
             );
           })}

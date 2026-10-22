@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { gluestackUIConfig } from "../styles/gluestack.config.js";
 
@@ -67,6 +67,11 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   const resolvedTheme: ResolvedTheme = theme === "auto" ? systemTheme : theme;
 
+  // A fresh config object per color mode invalidates Gluestack's per-instance
+  // style cache, so the mode's tokens are re-resolved without remounting the
+  // tree (remounting would discard an in-progress answer).
+  const themedConfig = useMemo(() => ({ ...gluestackUIConfig }), [resolvedTheme]);
+
   useEffect(() => {
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-theme", resolvedTheme);
@@ -95,7 +100,7 @@ export const GluestackThemeProvider: React.FC<GluestackThemeProviderProps> = ({
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
-      <GluestackUIProvider config={gluestackUIConfig} colorMode={resolvedTheme}>
+      <GluestackUIProvider config={themedConfig} colorMode={resolvedTheme}>
         {children}
       </GluestackUIProvider>
     </ThemeContext.Provider>

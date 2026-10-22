@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Question } from "../../parse/schema.js";
 import { MarkdownView } from "../MarkdownView.js";
+import type { KeyboardSelection } from "../shortcuts.js";
 import {
   Box,
   Text,
@@ -17,6 +18,7 @@ export interface TrueFalseProps {
     isCorrect: boolean;
     userResponse: unknown;
   };
+  keyboardSelection?: KeyboardSelection | null;
   onAnswer?: (response: string, isCorrect: boolean) => void;
   disabled?: boolean;
 }
@@ -24,6 +26,7 @@ export interface TrueFalseProps {
 export const TrueFalse: React.FC<TrueFalseProps> = ({
   question,
   savedAnswer,
+  keyboardSelection,
   onAnswer,
   disabled = false,
 }) => {
@@ -39,6 +42,14 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
     return typeof savedAnswer?.userResponse === "string" ? savedAnswer.userResponse : "";
   });
   const [isLocked, setIsLocked] = useState<boolean>(() => Boolean(savedAnswer));
+
+  // Digits map to the rendered order: 1 is True, 2 is False.
+  useEffect(() => {
+    if (!keyboardSelection || isLocked || disabled) return;
+    const rendered = [trueOption, falseOption];
+    const option = rendered[keyboardSelection.index];
+    if (option) setSelectedId(option.id);
+  }, [keyboardSelection, isLocked, disabled, trueOption, falseOption]);
 
   const handleSelect = (id: string) => {
     if (isLocked || disabled) return;
@@ -91,6 +102,9 @@ export const TrueFalse: React.FC<TrueFalseProps> = ({
 
       {!isLocked && (
         <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={!selectedId || disabled ? "disabled" : "enabled"}
           size="md"
           variant="solid"
           action="primary"

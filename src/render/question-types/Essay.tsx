@@ -2,9 +2,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Question } from "../../parse/schema.js";
 import { highlightMatchedWords, matchConcepts } from "../nlp/conceptMatcher.js";
 import { MarkdownView } from "../MarkdownView.js";
+import { TextareaInputEx } from "../themed-aliases.js";
 import {
   Textarea,
-  TextareaInput,
   Button,
   ButtonText,
   Box,
@@ -14,8 +14,7 @@ import {
   Badge,
   BadgeText,
   VStack,
-  HStack,
-  Checkbox,
+  HStack,  Checkbox,
   CheckboxIndicator,
   CheckboxLabel,
 } from "@gluestack-ui/themed";
@@ -141,7 +140,7 @@ export const Essay: React.FC<EssayProps> = ({
         <Box>
           <Box>
             <Textarea mb="$3" size="md" isDisabled={disabled}>
-              <TextareaInput
+              <TextareaInputEx
                 placeholder="Write your essay response here..."
                 value={text}
                 disabled={disabled}
@@ -158,6 +157,9 @@ export const Essay: React.FC<EssayProps> = ({
             </Text>
 
             <Button
+              // Remount on a disabled-state change: Gluestack keeps the disabled
+              // opacity (0.4) once a button has been disabled.
+              key={!text.trim() || disabled ? "disabled" : "enabled"}
               size="md"
               variant="solid"
               action="primary"
@@ -172,7 +174,7 @@ export const Essay: React.FC<EssayProps> = ({
       ) : (
         <Box>
           <HStack mb="$3" justifyContent="space-between" alignItems="center">
-            <Badge variant="solid" action="primary" p="$1">
+            <Badge variant="solid" action="info" p="$1">
               <BadgeText>Concept Coverage: {conceptMatch.coveragePercent}%</BadgeText>
             </Badge>
             <Button

@@ -85,21 +85,91 @@ export const componentsConfig = {
         action: {
           ...defaultConfig.components.Button.theme.variants.action,
           primary: {
-            ...defaultConfig.components.Button.theme.variants.action.primary,
             bg: "$primary500",
             borderColor: "$primary300",
+            ":hover": {
+              bg: "$primary600",
+              borderColor: "$primary600",
+            },
+            ":active": {
+              bg: "$primary700",
+              borderColor: "$primary700",
+            },
             _text: {
               color: "$textLight0",
             },
             _dark: {
-              bg: "$primary400",
-              borderColor: "$primary400",
-              _text: {
-                color: "$textDark0",
-              },
+              bg: "$dmAccent",
+              borderColor: "$dmAccent",
               ":hover": {
-                bg: "$primary300",
+                bg: "$dmAccentHover",
+                borderColor: "$dmAccentHover",
               },
+              ":active": {
+                bg: "$dmAccentActive",
+                borderColor: "$dmAccentActive",
+              },
+              _text: {
+                color: "$dmAccentInk",
+              },
+            },
+          },
+          secondary: {
+            bg: "transparent",
+            borderColor: "$borderLight300",
+            ":hover": {
+              bg: "$primary50",
+              borderColor: "$primary500",
+            },
+            ":active": {
+              bg: "$primary50",
+              borderColor: "$primary700",
+            },
+            _text: {
+              color: "$textLight800",
+              ":hover": {
+                color: "$primary600",
+              },
+              ":active": {
+                color: "$primary700",
+              },
+            },
+            _dark: {
+              bg: "transparent",
+              borderColor: "$borderDark700",
+              ":hover": {
+                bg: "$dmAccentSoft",
+                borderColor: "$dmAccent",
+              },
+              ":active": {
+                bg: "$dmAccentSoft",
+                borderColor: "$dmAccentActive",
+              },
+              _text: {
+                color: "$textDark200",
+                ":hover": {
+                  color: "$dmAccent",
+                },
+                ":active": {
+                  color: "$dmAccentActive",
+                },
+              },
+            },
+          },
+        },
+        variant: {
+          ...defaultConfig.components.Button.theme.variants.variant,
+          // Link buttons stay text-only: no surface fill in any state.
+          link: {
+            ...defaultConfig.components.Button.theme.variants.variant.link,
+            bg: "transparent",
+            ":hover": {
+              bg: "transparent",
+              _text: { textDecorationLine: "underline" },
+            },
+            ":active": {
+              bg: "transparent",
+              _text: { textDecorationLine: "underline" },
             },
           },
         },
@@ -126,6 +196,8 @@ export const gluestackUIConfig = createConfig({
       primary0: "#ffffff",
 
       dmAccent: "#7fb88a",
+      dmAccentHover: "#98c9a1",
+      dmAccentActive: "#6aa377",
       dmAccentSoft: "#2a3a30",
       dmAccentInk: "#101613",
 
@@ -148,7 +220,7 @@ export const gluestackUIConfig = createConfig({
       textLight800: "#2a2c30",
       textLight700: "#4b4e57",
       textLight600: "#5f636e",
-      textLight500: "#777b86",
+      textLight500: "#6b6f78",
       textLight400: "#979799",
       textLight300: "#a3a6af",
 
@@ -175,7 +247,7 @@ export const gluestackUIConfig = createConfig({
       paperWhite: "#ffffff",
       mistGray: "#f2f2f3",
       fogWhite: "#fafafb",
-      slateGray: "#777b86",
+      slateGray: "#6b6f78",
       ashGray: "#979799",
       smokeGray: "#a3a6af",
       blushPeach: "#fbe1d1",

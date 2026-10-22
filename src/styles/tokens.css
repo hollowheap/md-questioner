@@ -45,7 +45,7 @@
   --paper-white:    #ffffff;
   --mist-gray:      #f2f2f3;
   --fog-white:      #fafafb;
-  --slate-gray:     #777b86;
+  --slate-gray:     #6b6f78;
   --ash-gray:       #979799;
   --smoke-gray:     #a3a6af;
   --blush-peach:    #fbe1d1;
@@ -87,6 +87,8 @@
   --dm-text-mid:    #a8a29a;
   --dm-text-lo:     #6f6a63;
   --dm-accent:      #7fb88a;
+  --dm-accent-hover:#98c9a1;
+  --dm-accent-active:#6aa377;
   --dm-accent-soft: #2a3a30;
   --dm-accent-ink:  #101613;
   --dm-border:      #2e353a;

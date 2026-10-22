@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Question } from "../../parse/schema.js";
 import { MarkdownView } from "../MarkdownView.js";
+import { TextareaInputEx } from "../themed-aliases.js";
 import {
   Textarea,
   TextareaInput,
@@ -45,7 +46,7 @@ export const Reflection: React.FC<ReflectionProps> = ({
     <Box>
       <Box mb="$5">
         <Textarea mb="$3" size="md" isDisabled={disabled}>
-          <TextareaInput
+          <TextareaInputEx
             placeholder="Reflect on this question, write down your reasoning, or take study notes..."
             value={text}
             disabled={disabled}

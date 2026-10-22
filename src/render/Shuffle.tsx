@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, ButtonText } from "@gluestack-ui/themed";
+import { ButtonText } from "@gluestack-ui/themed";
+import { ButtonEx } from "./themed-aliases.js";
 
 export interface ShuffleProps {
   isShuffled?: boolean;
@@ -24,7 +25,7 @@ export const Shuffle: React.FC<ShuffleProps> = ({
   };
 
   return (
-    <Button
+    <ButtonEx
       size="md"
       variant={isShuffled ? "solid" : "outline"}
       action={isShuffled ? "primary" : "secondary"}
@@ -35,7 +36,7 @@ export const Shuffle: React.FC<ShuffleProps> = ({
       aria-pressed={isShuffled}
     >
       <ButtonText>{isShuffled ? "Shuffled" : "Shuffle"}</ButtonText>
-    </Button>
+    </ButtonEx>
   );
 };
 

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Question } from "../../parse/schema.js";
 import { MarkdownView } from "../MarkdownView.js";
+import type { KeyboardSelection } from "../shortcuts.js";
 import {
   RadioGroup,
   Radio,
@@ -20,6 +21,7 @@ export interface MultiChoiceProps {
     isCorrect: boolean;
     userResponse: unknown;
   };
+  keyboardSelection?: KeyboardSelection | null;
   onAnswer?: (response: string, isCorrect: boolean) => void;
   disabled?: boolean;
 }
@@ -27,6 +29,7 @@ export interface MultiChoiceProps {
 export const MultiChoice: React.FC<MultiChoiceProps> = ({
   question,
   savedAnswer,
+  keyboardSelection,
   onAnswer,
   disabled = false,
 }) => {
@@ -36,6 +39,12 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
   const [isLocked, setIsLocked] = useState<boolean>(() => Boolean(savedAnswer));
 
   const options = question.options || [];
+
+  useEffect(() => {
+    if (!keyboardSelection || isLocked || disabled) return;
+    const option = options[keyboardSelection.index];
+    if (option) setSelectedId(option.id);
+  }, [keyboardSelection, isLocked, disabled, options]);
 
   const handleSelect = (id: string) => {
     if (isLocked || disabled) return;
@@ -108,6 +117,9 @@ export const MultiChoice: React.FC<MultiChoiceProps> = ({
 
       {!isLocked && (
         <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={!selectedId || disabled ? "disabled" : "enabled"}
           size="md"
           variant="solid"
           action="primary"

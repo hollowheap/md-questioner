@@ -5,14 +5,19 @@ import {
   Button,
   ButtonText,
 } from "@gluestack-ui/themed";
+import { contentColumnStyle } from "./layout.js";
 
 export interface StepperProps {
   current: number;
   total: number;
   hasPrev?: boolean;
   hasNext?: boolean;
+  nextLabel?: string;
+  /** Replaces the "Q x / y" counter, e.g. "Results" on the results screen. */
+  counterLabel?: string;
   onPrev: () => void;
   onNext: () => void;
+  isMobile?: boolean;
 }
 
 export const Stepper: React.FC<StepperProps> = ({
@@ -20,21 +25,17 @@ export const Stepper: React.FC<StepperProps> = ({
   total,
   hasPrev = true,
   hasNext = true,
+  nextLabel = "Next",
+  counterLabel,
   onPrev,
   onNext,
+  isMobile = false,
 }) => {
   return (
     <HStack
       data-testid="mdq-stepper"
       testID="mdq-stepper"
-      position="sticky"
-      bottom={0}
-      left={0}
-      right={0}
-      zIndex={90}
-      justifyContent="space-between"
-      alignItems="center"
-      px="$8"
+      flexShrink={0}
       py="$4"
       borderTopWidth={1}
       borderColor="$borderLight200"
@@ -44,33 +45,44 @@ export const Stepper: React.FC<StepperProps> = ({
       aria-label="Question Stepper"
       role="contentinfo"
     >
-      <Button
-        size="md"
-        variant="outline"
-        action="secondary"
-        onClick={onPrev}
-        onPress={onPrev}
-        isDisabled={!hasPrev}
-        aria-label="Previous question"
+      <HStack
+        style={contentColumnStyle}
+        px={isMobile ? "$4" : "$8"}
+        justifyContent="space-between"
+        alignItems="center"
       >
-        <ButtonText>Prev</ButtonText>
-      </Button>
+        <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={`prev-${hasPrev ? "on" : "off"}`}
+          size="md"
+          variant="outline"
+          action="secondary"
+          onClick={onPrev}
+          onPress={onPrev}
+          isDisabled={!hasPrev}
+        >
+          <ButtonText>Prev</ButtonText>
+        </Button>
 
-      <Text size="md" fontWeight="$medium">
-        Q {current + 1} / {total}
-      </Text>
+        <Text size="md" fontWeight="$medium">
+          {counterLabel ?? `Q ${current + 1} / ${total}`}
+        </Text>
 
-      <Button
-        size="md"
-        variant="solid"
-        action="primary"
-        onClick={onNext}
-        onPress={onNext}
-        isDisabled={!hasNext}
-        aria-label="Next question"
-      >
-        <ButtonText>Next</ButtonText>
-      </Button>
+        <Button
+          // Remount on a disabled-state change: Gluestack keeps the disabled
+          // opacity (0.4) once a button has been disabled.
+          key={`next-${hasNext ? "on" : "off"}`}
+          size="md"
+          variant="solid"
+          action="primary"
+          onClick={onNext}
+          onPress={onNext}
+          isDisabled={!hasNext}
+        >
+          <ButtonText>{nextLabel}</ButtonText>
+        </Button>
+      </HStack>
     </HStack>
   );
 };

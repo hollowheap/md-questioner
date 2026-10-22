@@ -160,7 +160,7 @@ export function validateQuizModel(model: QuizModel, filePath?: string): void {
       if (match) {
         const sIdx = parseInt(match[1], 10);
         const qIdx = parseInt(match[2], 10);
-        sourceLine = model.sections?.[sIdx]?.questions?.[qIdx]?.sourceLine;
+        sourceLine = (model as QuizModel).sections?.[sIdx]?.questions?.[qIdx]?.sourceLine;
       }
     }
     const msg = `Schema validation error at ${err.instancePath || "/"}: ${err.message}`;
