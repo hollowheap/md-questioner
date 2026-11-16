@@ -2,12 +2,11 @@ import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { detectRuntime } from "./runtime.js";
 import { parseMarkdown } from "./parse/markdown.js";
-import { SchemaValidationError, validateQuizModel } from "./parse/validate.js";
+import { SchemaValidationError, quizModelSchema, validateQuizModel } from "./parse/validate.js";
 import { bundleStandaloneHtml } from "./bundle/inline.js";
 
-export { parseMarkdown, validateQuizModel, SchemaValidationError, bundleStandaloneHtml };
+export { parseMarkdown, validateQuizModel, SchemaValidationError, bundleStandaloneHtml, quizModelSchema };
 
 interface CliOptions {
   input?: string;
@@ -21,7 +20,7 @@ interface CliOptions {
   help: boolean;
 }
 
-function parseCliArgs(args: string[]): CliOptions {
+function parseCliArgs(args: string[]): { options: CliOptions; usageError?: string } {
   const options: CliOptions = {
     out: "./out/",
     theme: "auto",
@@ -30,6 +29,10 @@ function parseCliArgs(args: string[]): CliOptions {
     verify: false,
     version: false,
     help: false,
+  };
+  let usageError: string | undefined;
+  const fail = (message: string) => {
+    usageError ??= message;
   };
 
   const positional: string[] = [];
@@ -50,31 +53,53 @@ function parseCliArgs(args: string[]): CliOptions {
     } else if (arg === "-o" || arg === "--out") {
       if (i + 1 < args.length) {
         options.out = args[++i];
+      } else {
+        fail(`Missing value for ${arg}`);
       }
     } else if (arg.startsWith("-o=")) {
-      options.out = arg.slice(3);
+      const value = arg.slice(3);
+      if (value) {
+        options.out = value;
+      } else {
+        fail("Missing value for -o");
+      }
     } else if (arg.startsWith("--out=")) {
-      options.out = arg.slice(6);
+      const value = arg.slice(6);
+      if (value) {
+        options.out = value;
+      } else {
+        fail("Missing value for --out");
+      }
     } else if (arg === "--theme") {
       if (i + 1 < args.length) {
         const val = args[++i];
         if (val === "light" || val === "dark" || val === "auto") {
           options.theme = val;
+        } else {
+          fail(`Unsupported theme: ${val}`);
         }
+      } else {
+        fail("Missing value for --theme");
       }
     } else if (arg.startsWith("--theme=")) {
       const val = arg.slice(8);
       if (val === "light" || val === "dark" || val === "auto") {
         options.theme = val;
+      } else {
+        fail(`Unsupported theme: ${val}`);
       }
     } else if (arg === "--title") {
       if (i + 1 < args.length) {
         options.title = args[++i];
+      } else {
+        fail("Missing value for --title");
       }
     } else if (arg.startsWith("--title=")) {
       options.title = arg.slice(8);
     } else if (!arg.startsWith("-")) {
       positional.push(arg);
+    } else {
+      fail(`Unknown option: ${arg}`);
     }
   }
 
@@ -82,7 +107,7 @@ function parseCliArgs(args: string[]): CliOptions {
     options.input = positional[0];
   }
 
-  return options;
+  return { options, usageError };
 }
 
 function printUsage(): void {
@@ -107,11 +132,7 @@ Options:
 `);
 }
 
-async function compileFile(
-  inputFilePath: string,
-  outputHtmlPath: string,
-  options: CliOptions
-): Promise<void> {
+async function renderFile(inputFilePath: string, options: CliOptions): Promise<string> {
   const content = await fs.readFile(inputFilePath, "utf-8");
   const model = parseMarkdown(content, inputFilePath, { validate: true });
 
@@ -119,12 +140,19 @@ async function compileFile(
     model.title = options.title;
   }
 
-  const html = await bundleStandaloneHtml(model, {
+  return bundleStandaloneHtml(model, {
     theme: options.theme,
     noShuffle: options.noShuffle,
     title: options.title || model.title,
   });
+}
 
+async function writeOutput(
+  inputFilePath: string,
+  outputHtmlPath: string,
+  html: string,
+  options: CliOptions
+): Promise<void> {
   const parentDir = path.dirname(outputHtmlPath);
   await fs.mkdir(parentDir, { recursive: true });
   await fs.writeFile(outputHtmlPath, html, "utf-8");
@@ -153,8 +181,17 @@ async function compileFile(
   }
 }
 
+async function compileFile(
+  inputFilePath: string,
+  outputHtmlPath: string,
+  options: CliOptions
+): Promise<void> {
+  const html = await renderFile(inputFilePath, options);
+  await writeOutput(inputFilePath, outputHtmlPath, html, options);
+}
+
 export async function runCli(args: string[] = process.argv.slice(2)): Promise<number> {
-  const options = parseCliArgs(args);
+  const { options, usageError } = parseCliArgs(args);
 
   if (options.version) {
     console.log("md-questioner v1.0.0");
@@ -166,11 +203,9 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
     return 0;
   }
 
-  // Runtime check
-  try {
-    detectRuntime();
-  } catch (err: any) {
-    console.error(err.message || "Error: Runtime check failed.");
+  if (usageError) {
+    console.error(`Error: ${usageError}`);
+    console.error("Run 'md-questioner --help' for usage instructions.");
     return 1;
   }
 
@@ -204,13 +239,27 @@ export async function runCli(args: string[] = process.argv.slice(2)): Promise<nu
       }
 
       const outDir = path.resolve(process.cwd(), options.out);
-      await fs.mkdir(outDir, { recursive: true });
+      const rendered: Array<{ inputPath: string; outPath: string; html: string }> = [];
 
       for (const mdFile of mdFiles) {
         const fullInputPath = path.join(resolvedInput, mdFile);
         const baseName = path.basename(mdFile, path.extname(mdFile));
         const outFilePath = path.join(outDir, `${baseName}.html`);
-        await compileFile(fullInputPath, outFilePath, options);
+        try {
+          rendered.push({
+            inputPath: fullInputPath,
+            outPath: outFilePath,
+            html: await renderFile(fullInputPath, options),
+          });
+        } catch (err: any) {
+          err.message = `${mdFile}: ${err.message || String(err)}`;
+          throw err;
+        }
+      }
+
+      await fs.mkdir(outDir, { recursive: true });
+      for (const item of rendered) {
+        await writeOutput(item.inputPath, item.outPath, item.html, options);
       }
 
       return 0;
