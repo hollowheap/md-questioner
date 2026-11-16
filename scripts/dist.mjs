@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs/promises";
 import fsSync from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +64,24 @@ Compile structured Markdown Q&A study guides into single-file, offline interacti
    - \`reference/example.md\`: Comprehensive sample guide covering all question types.
    - \`reference/schema.json\`: Formal JSON Schema Draft 2020-12 data model definition.
    - \`reference/design-tokens.md\`: Complete design system token reference.
+`;
+
+const SCHEMA_MD_CONTENT = `# Quiz DSL reference
+
+The compiler accepts Markdown study guides. \`schema.json\` beside this file is the formal
+JSON Schema (Draft 2020-12) of the parsed model, generated from the compiler's embedded
+schema, so it always matches what the compiler accepts.
+
+- Frontmatter: optional YAML block with \`title\`, \`description\`, \`author\`, \`tags\`.
+- Sections: \`## <section title>\`.
+- Questions: \`### <question title>\`; the body shape selects the type: an H4 \`Rubric\`
+  makes an essay, any other H4 a short answer, a GFM table a match-pairs question, a task
+  list a multi-choice / multi-select / true-false question, and a body without answer
+  markers a reflection.
+- Hints: a blockquote before the answer element becomes the hint; a blockquote after the
+  answer becomes the explanation.
+
+\`example.md\` beside this file is a complete guide covering every question type.
 `;
 
 const README_MD_CONTENT = `To compile a Markdown study guide into an interactive single-file HTML quiz, invoke \`./scripts/md-questioner <input.md> -o <output-dir-or-file>\`. Directory inputs compile all \`.md\` files into \`<output-dir>/\`. Ensure input matches \`../reference/schema.md\`.
@@ -158,10 +176,25 @@ exec node "$DIR/md-questioner.mjs" "$@"
   await fs.writeFile(readmePath, README_MD_CONTENT, "utf-8");
   console.log(`[dist] Emitted ${readmePath}`);
 
-  // 7. Ensure reference files exist
+  // 7. Generate reference files from the compiler and its canonical fixture
   const examplePath = path.resolve(distReferenceDir, "example.md");
   const schemaMdPath = path.resolve(distReferenceDir, "schema.md");
   const schemaJsonPath = path.resolve(distReferenceDir, "schema.json");
+
+  const builtModule = await import(
+    pathToFileURL(path.resolve(distScriptsDir, "md-questioner.mjs")).href
+  );
+  if (!builtModule.quizModelSchema) {
+    throw new Error("The built compiler does not export quizModelSchema.");
+  }
+  await fs.writeFile(
+    schemaJsonPath,
+    `${JSON.stringify(builtModule.quizModelSchema, null, 2)}\n`,
+    "utf-8"
+  );
+  await fs.writeFile(schemaMdPath, SCHEMA_MD_CONTENT, "utf-8");
+  await fs.copyFile(path.resolve(rootDir, "test/fixtures/full-feature.md"), examplePath);
+  console.log(`[dist] Generated ${schemaJsonPath}, ${schemaMdPath} and ${examplePath}`);
 
   if (!fsSync.existsSync(examplePath)) {
     throw new Error(`Required reference file missing: ${examplePath}`);
