@@ -2,7 +2,6 @@ node_modules/
 build/
 out/
 dist/scripts/md-questioner-bun
-artifacts/logs/
-artifacts/errors/
+.artifacts/
 *.log
 .DS_Store
