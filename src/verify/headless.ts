@@ -17,14 +17,73 @@ export interface VerifyOptions {
   headless?: boolean;
 }
 
+/** Well-known system locations, tried after CHROMIUM_PATH and PATH lookup. */
+const WELL_KNOWN_CHROMIUM_PATHS = [
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/run/current-system/sw/bin/chromium",
+  "/run/current-system/sw/bin/google-chrome",
+];
+
+/** Executable names looked up on PATH (Windows variants appended at runtime). */
+const CHROMIUM_EXECUTABLE_NAMES = [
+  "chromium",
+  "chromium-browser",
+  "google-chrome",
+  "google-chrome-stable",
+];
+
+function executableCandidateNames(): string[] {
+  if (process.platform !== "win32") {
+    return CHROMIUM_EXECUTABLE_NAMES;
+  }
+  return CHROMIUM_EXECUTABLE_NAMES.flatMap((name) => [`${name}.exe`, name]);
+}
+
 /**
- * Resolves Chromium executable path from environment variables or standard system locations.
+ * Finds a Chromium executable on PATH (no shell-out, no extra dependencies).
+ */
+function findChromiumOnPath(): string | undefined {
+  const pathValue = process.env.PATH;
+  if (!pathValue) {
+    return undefined;
+  }
+
+  const names = executableCandidateNames();
+  for (const dir of pathValue.split(path.delimiter)) {
+    if (!dir) {
+      continue;
+    }
+    for (const name of names) {
+      const candidate = path.join(dir, name);
+      try {
+        if (!fsSync.statSync(candidate).isFile()) {
+          continue;
+        }
+        if (process.platform !== "win32") {
+          fsSync.accessSync(candidate, fsSync.constants.X_OK);
+        }
+        return candidate;
+      } catch {
+        // Not present or not executable; keep looking.
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Resolves Chromium executable path in priority order: CHROMIUM_PATH, PATH, then
+ * well-known system locations (other explicit env overrides stay honored first).
  */
 function resolveChromiumExecutable(): string | undefined {
   const envCandidates = [
+    process.env.CHROMIUM_PATH,
     process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
     process.env.CHROME_BIN,
-    process.env.CHROMIUM_PATH,
   ].filter(Boolean) as string[];
 
   for (const envPath of envCandidates) {
@@ -33,17 +92,12 @@ function resolveChromiumExecutable(): string | undefined {
     }
   }
 
-  const systemCandidates = [
-    "/nix/store/j2v1hxzvfb4z6i876x8ik3dcmqs83kdq-chromium-154.0.8037.97/bin/chromium",
-    "/usr/bin/chromium",
-    "/usr/bin/chromium-browser",
-    "/usr/bin/google-chrome",
-    "/usr/bin/google-chrome-stable",
-    "/run/current-system/sw/bin/chromium",
-    "/run/current-system/sw/bin/google-chrome",
-  ];
+  const onPath = findChromiumOnPath();
+  if (onPath) {
+    return onPath;
+  }
 
-  for (const candidate of systemCandidates) {
+  for (const candidate of WELL_KNOWN_CHROMIUM_PATHS) {
     if (fsSync.existsSync(candidate)) {
       return candidate;
     }
@@ -64,7 +118,10 @@ async function launchBrowser(headless: boolean): Promise<Browser> {
     "--disable-gpu",
   ];
 
+  const attemptedCandidates: string[] = [];
+
   if (executablePath) {
+    attemptedCandidates.push(executablePath);
     try {
       return await chromium.launch({
         headless,
@@ -76,6 +133,7 @@ async function launchBrowser(headless: boolean): Promise<Browser> {
     }
   }
 
+  attemptedCandidates.push("playwright default (bundled chromium)");
   try {
     return await chromium.launch({
       headless,
@@ -84,14 +142,13 @@ async function launchBrowser(headless: boolean): Promise<Browser> {
   } catch (err: any) {
     // Attempt fallback to any detected system binary
     const fallbackCandidates = [
-      "/usr/bin/chromium",
-      "/usr/bin/chromium-browser",
-      "/usr/bin/google-chrome",
-      "/usr/bin/google-chrome-stable",
-      "/run/current-system/sw/bin/chromium",
-    ];
+      findChromiumOnPath(),
+      ...WELL_KNOWN_CHROMIUM_PATHS,
+    ].filter((cand): cand is string => Boolean(cand));
+
     for (const cand of fallbackCandidates) {
       if (fsSync.existsSync(cand) && cand !== executablePath) {
+        attemptedCandidates.push(cand);
         try {
           return await chromium.launch({
             headless,
@@ -104,7 +161,9 @@ async function launchBrowser(headless: boolean): Promise<Browser> {
       }
     }
     throw new Error(
-      `Failed to launch Chromium for headless verification: ${err.message || String(err)}`
+      `Failed to launch Chromium for headless verification: ${err.message || String(err)}. ` +
+        `Set CHROMIUM_PATH to a Chromium/Chrome executable. ` +
+        `Candidates tried: ${attemptedCandidates.join(", ")}`
     );
   }
 }

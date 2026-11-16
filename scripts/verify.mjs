@@ -17,6 +17,10 @@ async function verifyAll() {
   const reports = [];
 
   // Ensure fresh build and out directories
+  const generatedBundlePath = path.resolve(rootDir, "src/bundle/client-bundle.generated.ts");
+  const bundleBefore = fsSync.existsSync(generatedBundlePath)
+    ? await fs.readFile(generatedBundlePath, "utf-8")
+    : null;
   console.log("[Setup] Running scripts/build.mjs...");
   const buildRes = spawnSync("node", ["scripts/build.mjs"], {
     cwd: rootDir,
@@ -24,6 +28,19 @@ async function verifyAll() {
   });
   if (buildRes.status !== 0) {
     throw new Error("scripts/build.mjs failed");
+  }
+
+  const bundleAfter = fsSync.existsSync(generatedBundlePath)
+    ? await fs.readFile(generatedBundlePath, "utf-8")
+    : null;
+  if (bundleBefore !== null && bundleAfter !== bundleBefore) {
+    await fs.writeFile(generatedBundlePath, bundleBefore, "utf-8");
+    console.error(
+      "\n❌ The committed client bundle is stale: the rebuild rewrote " +
+        `src/bundle/client-bundle.generated.ts and verification restored the committed copy.\n` +
+        "   Run 'npm run build', commit the regenerated bundle, then re-run verification."
+    );
+    process.exit(1);
   }
 
   const { runHeadlessVerification } = await import("../dist/verify/headless.js");
@@ -212,9 +229,9 @@ async function verifyAll() {
   }
 
   // --------------------------------------------------------------------------
-  // Write artifacts/VERIFICATION.md
+  // Write .artifacts/VERIFICATION.md
   // --------------------------------------------------------------------------
-  console.log("\nGenerating artifacts/VERIFICATION.md report...");
+  console.log("\nGenerating .artifacts/VERIFICATION.md report...");
   const allPassed = reports.every((r) => r.passed);
   const now = new Date().toISOString();
 
@@ -282,12 +299,13 @@ ${reports.find((r) => r.id === 8)?.output || "N/A"}
 *Generated automatically by \`scripts/verify.mjs\`.*
 `;
 
-  const verificationPath = path.resolve(rootDir, "artifacts/VERIFICATION.md");
+  const verificationPath = path.resolve(rootDir, ".artifacts/VERIFICATION.md");
+  await fs.mkdir(path.dirname(verificationPath), { recursive: true });
   await fs.writeFile(verificationPath, markdownReport, "utf-8");
   console.log(`Report written to ${verificationPath}`);
 
   if (!allPassed) {
-    console.error("\n❌ Verification failed. Check artifacts/VERIFICATION.md for details.");
+    console.error("\n❌ Verification failed. Check .artifacts/VERIFICATION.md for details.");
     process.exit(1);
   }
 
