@@ -61,34 +61,106 @@ const markedRenderer = new Marked({
 const RAW_IMAGE_TAG = /<img\b([^>]*)>/gi;
 
 /**
- * Raw HTML in the source can reference external assets (iframe, script, video, ...)
- * or run inline handlers, which would break the zero-network invariant. The
- * generated Markdown markup (p, ul, code, table, ...) is left untouched.
+ * Author-supplied HTML is untrusted, so it is filtered through an allowlist rather
+ * than a regex denylist (a denylist can be sidestepped by splitting a tag, e.g.
+ * `<scr<script>ipt>`). Only inert prose elements and attributes survive; every
+ * other tag token is dropped while its inner text stays visible, which keeps the
+ * zero-network invariant and the author's prose intact.
  *
- * The first pattern consumes the matching closer and everything between it, so a
- * closed element's body never leaks into prose; with no closer it falls back to
- * stripping the opener alone (the leftover text is inert). The second pattern
- * removes stray end tags left over from mismatched markup.
+ * Elements that fetch resources or execute code lose their body as well: the body
+ * runs to the matching closer. With no closer only the opener is dropped, since the
+ * remaining text is inert plain text.
  */
-const RAW_HTML_ELEMENTS =
-  /<(script|style|iframe|frame|frameset|object|embed|applet|video|audio|source|track|link|base|meta|form|input|button|select|option|textarea|noscript|template|svg|math)\b[^>]*>(?:[\s\S]*?<\/\1\s*>)?/gi;
-const RAW_HTML_CLOSERS =
-  /<\/\s*(script|style|iframe|frame|frameset|object|embed|applet|video|audio|source|track|link|base|meta|form|input|button|select|option|textarea|noscript|template|svg|math)\s*>/gi;
-const EVENT_HANDLER_ATTRS = /\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi;
-const INLINE_STYLE_ATTRS = /\sstyle\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi;
-const RESOURCE_ATTRS =
-  /\s(?:src|srcset|data|poster|background|action|formaction|xlink:href)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi;
-const SCRIPT_HREFS =
-  /\shref\s*=\s*(?:"javascript:[^"]*"|'javascript:[^']*'|javascript:[^\s>]+)/gi;
+const ALLOWED_ELEMENTS = new Set([
+  "p", "br", "hr", "em", "strong", "b", "i", "u", "s", "del", "ins", "mark",
+  "small", "sub", "sup", "code", "pre", "blockquote", "ul", "ol", "li", "dl",
+  "dt", "dd", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption",
+  "a", "span", "div", "h1", "h2", "h3", "h4", "h5", "h6", "details", "summary",
+]);
+const ALLOWED_ATTRIBUTES = new Set([
+  "href", "title", "class", "id", "colspan", "rowspan", "start", "open",
+]);
+const NUMERIC_ATTRIBUTES = new Set(["colspan", "rowspan", "start"]);
+/** Elements whose entire body is discarded (resource loaders, script hosts, ...). */
+const DISCARDED_ELEMENTS = new Set([
+  "script", "style", "iframe", "frame", "frameset", "object", "embed", "applet",
+  "video", "audio", "source", "track", "link", "base", "meta", "form", "input",
+  "button", "select", "option", "textarea", "noscript", "template", "svg", "math",
+]);
+const SAFE_HREF = /^(?:https?:|mailto:)/i;
+/** A tag run; `<` is excluded from the body so split tags never reassemble. */
+const HTML_TAG = /^<(\/?)([a-zA-Z][a-zA-Z0-9:-]*)((?:[^<>"']|"[^"]*"|'[^']*')*)>/;
+const HTML_COMMENT = /^<!--[\s\S]*?-->/;
+const HTML_DECLARATION = /^<[!?][\s\S]*?>/;
+
+/** Text is emitted verbatim except stray `<`, which could otherwise start a tag. */
+function escapeText(text: string): string {
+  return text.replace(/</g, "&lt;");
+}
+
+function escapeAttributeValue(value: string): string {
+  return value.replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** Rebuilds an allowlisted attribute list; unknown names and unsafe values vanish. */
+function sanitizeAttributes(raw: string): string {
+  const attribute = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  let out = "";
+  for (const match of raw.matchAll(attribute)) {
+    const name = match[1].toLowerCase();
+    if (!ALLOWED_ATTRIBUTES.has(name)) continue;
+    const value = match[2] ?? match[3] ?? match[4];
+    if (value === undefined) {
+      if (name === "open") out += " open";
+      continue;
+    }
+    if (name === "href" && !SAFE_HREF.test(value.trim())) continue;
+    if (NUMERIC_ATTRIBUTES.has(name) && !/^\d+$/.test(value.trim())) continue;
+    out += ` ${name}="${escapeAttributeValue(value)}"`;
+  }
+  return out;
+}
 
 function sanitizeHtml(html: string): string {
-  return html
-    .replace(RAW_HTML_ELEMENTS, "")
-    .replace(RAW_HTML_CLOSERS, "")
-    .replace(EVENT_HANDLER_ATTRS, "")
-    .replace(INLINE_STYLE_ATTRS, "")
-    .replace(RESOURCE_ATTRS, "")
-    .replace(SCRIPT_HREFS, ' href="#"');
+  let out = "";
+  let index = 0;
+  while (index < html.length) {
+    const open = html.indexOf("<", index);
+    if (open === -1) {
+      out += escapeText(html.slice(index));
+      break;
+    }
+    out += escapeText(html.slice(index, open));
+    const rest = html.slice(open);
+    const comment = HTML_COMMENT.exec(rest);
+    if (comment) {
+      index = open + comment[0].length;
+      continue;
+    }
+    const declaration = HTML_DECLARATION.exec(rest);
+    if (declaration) {
+      index = open + declaration[0].length;
+      continue;
+    }
+    const tag = HTML_TAG.exec(rest);
+    if (!tag) {
+      // Not a tag: emit the `<` escaped and keep scanning from the next character.
+      out += "&lt;";
+      index = open + 1;
+      continue;
+    }
+    const [token, closing, rawName, rawAttributes = ""] = tag;
+    index = open + token.length;
+    const name = rawName.toLowerCase();
+    if (!closing && DISCARDED_ELEMENTS.has(name)) {
+      const closer = new RegExp(`<\\/\\s*${name}\\b[^<>]*>`, "i").exec(html.slice(index));
+      if (closer) index += closer.index + closer[0].length;
+      continue;
+    }
+    if (!ALLOWED_ELEMENTS.has(name)) continue;
+    out += closing ? `</${name}>` : `<${name}${sanitizeAttributes(rawAttributes)}>`;
+  }
+  return out;
 }
 
 function stripImages(html: string): string {

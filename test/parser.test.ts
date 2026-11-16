@@ -175,6 +175,34 @@ describe("Images are not supported", () => {
   });
 });
 
+describe("HTML allowlist sanitizer", () => {
+  it("drops mangled script tags that only form a tag after reassembly", () => {
+    const md = `# Quiz\n\n### Mangled script\n\n<div><scr<script>ipt>alert(1)//</scr<script>ipt></div>\n\nProse tail.`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("<script");
+    expect(q.promptHtml).not.toContain("</script");
+    expect(q.promptHtml).toContain("Prose tail.");
+  });
+
+  it("drops slash-separated event handler attributes and keeps inner text", () => {
+    const md = `# Quiz\n\n### Slash attributes\n\n<div><b/onmouseover=alert(1)>y</b></div>`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).not.toContain("onmouseover");
+    expect(q.promptHtml).not.toContain("alert(1)");
+    expect(q.promptHtml).toContain("y");
+  });
+
+  it("keeps allowlisted prose tags, href and text", () => {
+    const md = `# Quiz\n\n### Allowlisted markup\n\n<div><strong>bold</strong> <a href="https://example.com/x">link</a></div>`;
+    const model = parseMarkdown(md);
+    const q = model.sections[0].questions[0];
+    expect(q.promptHtml).toContain("<strong>bold</strong>");
+    expect(q.promptHtml).toContain('<a href="https://example.com/x">link</a>');
+  });
+});
+
 describe("Hint extraction vs prose blockquotes", () => {
   it("treats first blockquote as hint and subsequent blockquote as prompt prose", () => {
     const md = `# Quiz\n\n### Question with hints\n\n> This is the hint.\n\nSome prompt text.\n\n> This is prose in the prompt.\n\n- [x] Option 1\n- [ ] Option 2`;
