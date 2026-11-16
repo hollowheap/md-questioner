@@ -47,6 +47,30 @@ function sanitizeJson(data: unknown): string {
     .replace(/&/g, "\\u0026");
 }
 
+const SCRIPT_TAG = /<script\b/i;
+const INLINE_HANDLER = /<[a-z][a-z0-9-]*\b[^>]*\son[a-z]+\s*=/i;
+
+/** Refuses to inline author markup that still carries a script or an inline handler. */
+function assertInertMarkup(html: string | undefined, where: string): void {
+  if (!html) return;
+  if (SCRIPT_TAG.test(html) || INLINE_HANDLER.test(html)) {
+    throw new Error(
+      `Refusing to ship hostile markup in ${where}: a script element or inline event handler survived sanitization.`
+    );
+  }
+}
+
+function assertInertModel(quiz: QuizModel): void {
+  for (const section of quiz.sections) {
+    for (const question of section.questions) {
+      const where = `section "${section.title}" / question "${question.title}"`;
+      assertInertMarkup(question.promptHtml, `${where} prompt`);
+      assertInertMarkup(question.explanationHtml, `${where} explanation`);
+      assertInertMarkup(question.modelAnswerHtml, `${where} model answer`);
+    }
+  }
+}
+
 let cachedPrebundled: { clientJs?: string; clientCss?: string } | null = null;
 
 async function loadPrebundled(): Promise<{ clientJs?: string; clientCss?: string } | null> {
@@ -145,9 +169,17 @@ export async function bundleStandaloneHtml(
       });
       inlinedJs = buildResult.outputFiles?.[0]?.text || "";
     } catch (err) {
-      console.warn("Dynamic JS bundle generation warning:", err);
+      throw new Error(
+        `Failed to bundle the client runtime: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
+
+  if (!inlinedJs.trim()) {
+    throw new Error("Client runtime bundle is empty; refusing to emit a quiz without it.");
+  }
+
+  assertInertModel(quiz);
 
   // Override title in quiz model if specified
   const effectiveTitle = options.title || quiz.title || "md-questioner Quiz";

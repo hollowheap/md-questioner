@@ -37,6 +37,7 @@ const MODAL_SCRIM = "rgba(0, 0, 0, 0.5)";
 interface SavedState {
   activeSectionIndex: number;
   activeQuestionIndex: number;
+  activeQuestionId?: string;
   answeredQuestions: Record<string, {
     isCorrect: boolean;
     userResponse: unknown;
@@ -125,23 +126,51 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
       const savedRaw = localStorage.getItem(storageKey);
       if (savedRaw) {
         const saved: SavedState = JSON.parse(savedRaw);
+        const validQuestionIds = new Set(
+          quizModel.sections.flatMap((section) => section.questions.map((question) => question.id))
+        );
+
+        let restoredSection = -1;
+        if (typeof saved.activeQuestionId === "string") {
+          restoredSection = quizModel.sections.findIndex((section) =>
+            section.questions.some((question) => question.id === saved.activeQuestionId)
+          );
+        }
         if (
+          restoredSection === -1 &&
           typeof saved.activeSectionIndex === "number" &&
           saved.activeSectionIndex >= 0 &&
           saved.activeSectionIndex < quizModel.sections.length
         ) {
-          setActiveSectionIndex(saved.activeSectionIndex);
-          const sec = quizModel.sections[saved.activeSectionIndex];
-          if (
-            typeof saved.activeQuestionIndex === "number" &&
-            saved.activeQuestionIndex >= 0 &&
-            saved.activeQuestionIndex < sec.questions.length
-          ) {
-            setActiveQuestionIndex(saved.activeQuestionIndex);
+          restoredSection = saved.activeSectionIndex;
+        }
+
+        if (restoredSection >= 0) {
+          setActiveSectionIndex(restoredSection);
+          const section = quizModel.sections[restoredSection];
+          const byId =
+            typeof saved.activeQuestionId === "string"
+              ? section.questions.findIndex((question) => question.id === saved.activeQuestionId)
+              : -1;
+          const byIndex =
+            typeof saved.activeQuestionIndex === "number" ? saved.activeQuestionIndex : 0;
+          const restoredQuestion = byId >= 0 ? byId : byIndex;
+          if (restoredQuestion >= 0 && restoredQuestion < section.questions.length) {
+            setActiveQuestionIndex(restoredQuestion);
           }
         }
+
         if (saved.answeredQuestions && typeof saved.answeredQuestions === "object") {
-          setAnsweredQuestions(saved.answeredQuestions);
+          const restoredAnswers: Record<string, { isCorrect: boolean; userResponse: unknown }> = {};
+          for (const [questionId, entry] of Object.entries(saved.answeredQuestions)) {
+            if (!validQuestionIds.has(questionId) || !entry || typeof entry !== "object") continue;
+            if (typeof entry.isCorrect !== "boolean") continue;
+            restoredAnswers[questionId] = {
+              isCorrect: entry.isCorrect,
+              userResponse: entry.userResponse,
+            };
+          }
+          setAnsweredQuestions(restoredAnswers);
         }
         if (saved.showResults === true) {
           setShowResults(true);
@@ -151,21 +180,6 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
       // Storage unavailable or corrupted
     }
   }, [storageKey, quizModel.sections]);
-
-  // Persist state changes
-  useEffect(() => {
-    try {
-      const stateToSave: SavedState = {
-        activeSectionIndex,
-        activeQuestionIndex,
-        answeredQuestions,
-        showResults,
-      };
-      localStorage.setItem(storageKey, JSON.stringify(stateToSave));
-    } catch {
-      // Storage unavailable
-    }
-  }, [storageKey, activeSectionIndex, activeQuestionIndex, answeredQuestions, showResults]);
 
   const currentSection: Section = quizModel.sections[activeSectionIndex] || quizModel.sections[0];
 
@@ -182,6 +196,30 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
   }, [currentSection, isShuffled]);
 
   const currentQuestion: QuestionData | undefined = displayedQuestions[activeQuestionIndex];
+
+  // Persist state changes, keying the position by question identity so a shuffled
+  // display order cannot restore a different question after a reload.
+  useEffect(() => {
+    try {
+      const stateToSave: SavedState = {
+        activeSectionIndex,
+        activeQuestionIndex,
+        activeQuestionId: currentQuestion?.id,
+        answeredQuestions,
+        showResults,
+      };
+      localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+    } catch {
+      // Storage unavailable
+    }
+  }, [
+    storageKey,
+    activeSectionIndex,
+    activeQuestionIndex,
+    currentQuestion?.id,
+    answeredQuestions,
+    showResults,
+  ]);
 
   // Announce the active question whenever navigation changes it.
   useEffect(() => {

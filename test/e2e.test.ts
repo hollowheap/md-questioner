@@ -3,6 +3,8 @@ import fsSync from "node:fs";
 import path from "node:path";
 import { describe, it, expect, beforeAll } from "vitest";
 import { runCli } from "../src/cli.js";
+import { parseMarkdown } from "../src/parse/markdown.js";
+import { bundleStandaloneHtml } from "../src/bundle/inline.js";
 
 const rootDir = path.resolve(__dirname, "..");
 const outDir = path.resolve(rootDir, "out/e2e");
@@ -90,5 +92,14 @@ describe("E2E Compiler Integration Suite", () => {
 
     expect(exitCode).toBe(2);
     expect(fsSync.existsSync(outputPath)).toBe(false);
+  });
+
+  it("refuses to ship markup that still carries script or handlers", async () => {
+    const mdPath = path.resolve(__dirname, "fixtures/minimal.md");
+    const content = await fs.readFile(mdPath, "utf-8");
+    const model = parseMarkdown(content, mdPath, { validate: true });
+    model.sections[0].questions[0].promptHtml = '<div><script>alert(1)</script></div>';
+
+    await expect(bundleStandaloneHtml(model)).rejects.toThrow(/script/i);
   });
 });
