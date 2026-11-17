@@ -15,13 +15,10 @@ description: Compiles structured Markdown study guides and quiz notes into stand
 
 # md-questioner Skill
 
-Compile structured Markdown Q&A study guides into single-file, offline interactive HTML quizzes.
+## Scope
 
-## When to Use
-
-- When the user asks to generate an interactive quiz, practice questions, or flashcards from notes.
-- When transforming a Markdown study guide or syllabus into a browser-based self-testing application.
-- When compiling Q&A notes into a calm, sequential, single-file artifact that works completely offline via \`file://\`.
+- Covers: compiling structured Markdown Q&A study guides into single-file, offline HTML quizzes, including batch directories and headless verification.
+- Excludes: authoring source notes, online hosting, and non-Markdown input formats.
 
 ## Agent Instructions & Workflow
 
