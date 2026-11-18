@@ -229,6 +229,35 @@ async function verifyAll() {
   }
 
   // --------------------------------------------------------------------------
+  // Check 9: Regression discovery
+  // --------------------------------------------------------------------------
+  console.log("\n[Check 9/9] Regression discovery suite...");
+  try {
+    const testRes = spawnSync(
+      "npx",
+      ["vitest", "run", "test/regression.test.ts"],
+      { cwd: rootDir, encoding: "utf-8" }
+    );
+    const output = `${testRes.stdout || ""}${testRes.stderr || ""}`.trim().slice(-6000);
+    if (testRes.status !== 0) throw new Error(output || "vitest exited non-zero");
+    reports.push({
+      id: 9,
+      name: "Regression discovery suite",
+      passed: true,
+      output: output || "PASSED: regression suite returned 0.",
+    });
+    console.log("  ✓ PASSED");
+  } catch (err) {
+    reports.push({
+      id: 9,
+      name: "Regression discovery suite",
+      passed: false,
+      output: `FAILED: ${err.message}`,
+    });
+    console.log(`  ✗ FAILED: ${String(err.message).split("\n").pop()}`);
+  }
+
+  // --------------------------------------------------------------------------
   // Write .artifacts/VERIFICATION.md
   // --------------------------------------------------------------------------
   console.log("\nGenerating .artifacts/VERIFICATION.md report...");
@@ -238,11 +267,11 @@ async function verifyAll() {
   let markdownReport = `# Verification Report: md-questioner
 
 **Date:** ${now}  
-**Status:** ${allPassed ? "PASSED (100%)" : "FAILED"}  
+**Status:** ${allPassed ? `PASSED (${reports.length}/${reports.length})` : "FAILED"}
 **Environment:** Linux (NixOS) / Node.js ${process.version} / Bun (Host Compiler)  
 
 ## Summary
-The §10 Mandatory Verification Suite was executed across all 8 required criteria. Every test executed against real compiled artifacts using the production toolchain and headless browser automation.
+The §10 Mandatory Verification Suite was executed across all ${reports.length} required criteria. Every test executed against real compiled artifacts using the production toolchain and headless browser automation.
 
 | # | Check Name | Status | Details |
 | :-: | :--- | :-: | :--- |
@@ -295,6 +324,11 @@ ${reports.find((r) => r.id === 7)?.output || "N/A"}
 ${reports.find((r) => r.id === 8)?.output || "N/A"}
 \`\`\`
 
+### 9. Regression Discovery Suite
+\`\`\`
+${reports.find((r) => r.id === 9)?.output || "N/A"}
+\`\`\`
+
 ---
 *Generated automatically by \`scripts/verify.mjs\`.*
 `;
@@ -310,7 +344,7 @@ ${reports.find((r) => r.id === 8)?.output || "N/A"}
   }
 
   console.log("\n=================================================");
-  console.log("   ALL §10 VERIFICATION CHECKS PASSED (8/8)");
+  console.log(`   ALL §10 VERIFICATION CHECKS PASSED (${reports.length}/${reports.length})`);
   console.log("=================================================");
   process.exit(0);
 }

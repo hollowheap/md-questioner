@@ -194,8 +194,32 @@ export function validateQuizModel(model: QuizModel, filePath?: string): void {
     );
   }
 
+  const actualQuestions = model.sections.reduce(
+    (count, section) => count + section.questions.length,
+    0
+  );
+  if (model.totalQuestions !== actualQuestions) {
+    const sourceLine = model.sections
+      .flatMap((section) => section.questions)
+      .find((question) => question.sourceLine)?.sourceLine;
+    throw new SchemaValidationError(
+      `totalQuestions (${model.totalQuestions}) does not match ${actualQuestions} questions`,
+      sourceLine,
+      filePath
+    );
+  }
+
+  const seenQuestionIds = new Set<string>();
   for (const section of model.sections) {
     for (const q of section.questions) {
+      if (seenQuestionIds.has(q.id)) {
+        throw new SchemaValidationError(
+          `Duplicate question id \"${q.id}\"`,
+          q.sourceLine,
+          filePath
+        );
+      }
+      seenQuestionIds.add(q.id);
       if (
         q.type === "multi-choice" ||
         q.type === "multi-select" ||

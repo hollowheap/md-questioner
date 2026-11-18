@@ -45,6 +45,35 @@ interface SavedState {
   showResults?: boolean;
 }
 
+function isValidSavedResponse(question: QuestionData, response: unknown): boolean {
+  switch (question.type) {
+    case "multi-choice":
+    case "true-false":
+    case "short-answer":
+    case "reflection":
+      return typeof response === "string";
+    case "multi-select":
+      return Array.isArray(response) && response.every((id) => typeof id === "string");
+    case "match-pairs":
+      if (!response || typeof response !== "object" || Array.isArray(response)) return false;
+      return Object.values(response).every((value) => typeof value === "string");
+    case "essay":
+      if (typeof response === "string") return true;
+      if (!response || typeof response !== "object" || Array.isArray(response)) return false;
+      {
+        const saved = response as Record<string, unknown>;
+        const rubricOk =
+          saved.checkedRubric === undefined ||
+          (Array.isArray(saved.checkedRubric) &&
+            saved.checkedRubric.every((value) => typeof value === "boolean"));
+        const scoreOk = saved.score === undefined || typeof saved.score === "number";
+        return typeof saved.essayText === "string" && rubricOk && scoreOk;
+      }
+    default:
+      return false;
+  }
+}
+
 export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
   const quizModel = model || quiz;
 
@@ -162,9 +191,17 @@ export const App: React.FC<AppProps> = ({ model, quiz, noShuffle = false }) => {
 
         if (saved.answeredQuestions && typeof saved.answeredQuestions === "object") {
           const restoredAnswers: Record<string, { isCorrect: boolean; userResponse: unknown }> = {};
+          const questionsById = new Map(
+            quizModel.sections
+              .flatMap((section) => section.questions)
+              .map((question) => [question.id, question] as const)
+          );
           for (const [questionId, entry] of Object.entries(saved.answeredQuestions)) {
             if (!validQuestionIds.has(questionId) || !entry || typeof entry !== "object") continue;
             if (typeof entry.isCorrect !== "boolean") continue;
+            if (typeof entry.userResponse === "undefined" || entry.userResponse === null) continue;
+            const question = questionsById.get(questionId);
+            if (!question || !isValidSavedResponse(question, entry.userResponse)) continue;
             restoredAnswers[questionId] = {
               isCorrect: entry.isCorrect,
               userResponse: entry.userResponse,

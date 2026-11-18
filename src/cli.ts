@@ -34,11 +34,19 @@ function parseCliArgs(args: string[]): { options: CliOptions; usageError?: strin
   const fail = (message: string) => {
     usageError ??= message;
   };
-
   const positional: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
+    const takeValue = (): string | undefined => {
+      const next = args[i + 1];
+      if (next === undefined || next.startsWith("-")) {
+        fail(`Missing value for ${arg}`);
+        return undefined;
+      }
+      i += 1;
+      return next;
+    };
 
     if (arg === "-v" || arg === "--version") {
       options.version = true;
@@ -51,11 +59,8 @@ function parseCliArgs(args: string[]): { options: CliOptions; usageError?: strin
     } else if (arg === "--verify") {
       options.verify = true;
     } else if (arg === "-o" || arg === "--out") {
-      if (i + 1 < args.length) {
-        options.out = args[++i];
-      } else {
-        fail(`Missing value for ${arg}`);
-      }
+      const value = takeValue();
+      if (value !== undefined) options.out = value;
     } else if (arg.startsWith("-o=")) {
       const value = arg.slice(3);
       if (value) {
@@ -71,15 +76,13 @@ function parseCliArgs(args: string[]): { options: CliOptions; usageError?: strin
         fail("Missing value for --out");
       }
     } else if (arg === "--theme") {
-      if (i + 1 < args.length) {
-        const val = args[++i];
+      const val = takeValue();
+      if (val !== undefined) {
         if (val === "light" || val === "dark" || val === "auto") {
           options.theme = val;
         } else {
           fail(`Unsupported theme: ${val}`);
         }
-      } else {
-        fail("Missing value for --theme");
       }
     } else if (arg.startsWith("--theme=")) {
       const val = arg.slice(8);
@@ -89,13 +92,15 @@ function parseCliArgs(args: string[]): { options: CliOptions; usageError?: strin
         fail(`Unsupported theme: ${val}`);
       }
     } else if (arg === "--title") {
-      if (i + 1 < args.length) {
-        options.title = args[++i];
+      const value = takeValue();
+      if (value !== undefined) options.title = value;
+    } else if (arg.startsWith("--title=")) {
+      const value = arg.slice(8);
+      if (value) {
+        options.title = value;
       } else {
         fail("Missing value for --title");
       }
-    } else if (arg.startsWith("--title=")) {
-      options.title = arg.slice(8);
     } else if (!arg.startsWith("-")) {
       positional.push(arg);
     } else {
