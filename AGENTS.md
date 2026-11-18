@@ -16,7 +16,7 @@ TypeScript ESM CLI that compiles Markdown study guides into one standalone, offl
 - Keep the emitted quiz offline: it must run from `file://` with zero network calls and no external `<link>` or `<script src>`.
 - Gluestack silently drops numeric `maxW`/`width` props; express widths through inline `style` or `src/render/layout.ts`.
 - No linter or formatter is configured; do not add one.
-- Never store workspace artifacts outside `.artifacts/`.
-- Never emit internal workspace record terms, record IDs, or `.artifacts/` paths in commits, PRs, code comments, or public docs.
+- Never store workspace artifacts outside the hidden workspace directory.
+- Never emit internal workspace record terms, record IDs, or hidden workspace paths in commits, PRs, code comments, or public docs.
 - Never disable compiler flags, skip tests, or weaken verification gates to force a pass.
 - Never force-push without `--force-with-lease`.
