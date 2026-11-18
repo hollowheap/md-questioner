@@ -1156,30 +1156,36 @@ export async function runHeadlessVerification(
     try {
       const problems: string[] = [];
 
-      // First frame on which the element exists, captured in-page so the sample is not late.
-      const firstFrame = async (testId: string) =>
-        await page.evaluate(
-          (id) =>
-            new Promise<string | null>((resolve) => {
-              const tick = () => {
-                const el = document.querySelector(`[data-testid="${id}"]`);
-                if (el) {
-                  const style = window.getComputedStyle(el);
-                  resolve(
-                    JSON.stringify({
-                      transform: style.transform,
-                      opacity: style.opacity,
-                      height: style.height,
-                    })
-                  );
-                } else {
-                  requestAnimationFrame(tick);
-                }
-              };
-              requestAnimationFrame(tick);
-            }),
-          testId
-        );
+      const armFirstFrame = async (selector: string) =>
+        await page.evaluate((css) => {
+          const w = window as unknown as { __firstFrame?: Promise<string | null> };
+          w.__firstFrame = new Promise<string | null>((resolve) => {
+            const timer = window.setTimeout(() => resolve(null), 4000);
+            const tick = () => {
+              const el = document.querySelector(css);
+              if (el) {
+                const style = window.getComputedStyle(el);
+                window.clearTimeout(timer);
+                resolve(
+                  JSON.stringify({
+                    transform: style.transform,
+                    opacity: style.opacity,
+                    height: style.height,
+                  })
+                );
+              } else {
+                requestAnimationFrame(tick);
+              }
+            };
+            requestAnimationFrame(tick);
+          });
+        }, selector);
+
+      const readFirstFrame = async () =>
+        await page.evaluate(async () => {
+          const w = window as unknown as { __firstFrame?: Promise<string | null> };
+          return (await w.__firstFrame) ?? null;
+        });
 
       const settled = async (testId: string) =>
         await page.evaluate((id) => {
@@ -1215,8 +1221,9 @@ export async function runHeadlessVerification(
       await trigger.waitFor({ state: "visible", timeout: 4000 });
       await page.waitForTimeout(300);
 
+      await armFirstFrame('[data-testid="mdq-select-popup"]');
       await trigger.click();
-      const popupFirst = await firstFrame("mdq-select-popup");
+      const popupFirst = await readFirstFrame();
       await page.waitForTimeout(500);
       const popupSettled = await settled("mdq-select-popup");
       if (!popupFirst || !popupSettled) {
@@ -1237,8 +1244,9 @@ export async function runHeadlessVerification(
       // 2. Hint panel: animates in and out.
       const hintButton = page.locator('button:has-text("Hint:")').first();
       await hintButton.waitFor({ state: "visible", timeout: 4000 });
+      await armFirstFrame('[data-testid="mdq-hint-panel"]');
       await hintButton.click();
-      const hintFirst = await firstFrame("mdq-hint-panel");
+      const hintFirst = await readFirstFrame();
       await page.waitForTimeout(500);
       const hintSettled = await settled("mdq-hint-panel");
       if (!hintFirst || !hintSettled) {
@@ -1257,8 +1265,9 @@ export async function runHeadlessVerification(
       }
 
       // 3. Retake modal: animates in and out.
+      await armFirstFrame('[data-testid="mdq-retake-modal"]');
       await page.locator('button:has-text("Retake")').first().click();
-      const modalFirst = await firstFrame("mdq-retake-modal");
+      const modalFirst = await readFirstFrame();
       await page.waitForTimeout(500);
       const modalSettled = await settled("mdq-retake-modal");
       if (!modalFirst || !modalSettled) {
@@ -1277,10 +1286,18 @@ export async function runHeadlessVerification(
       }
 
       // 4. Question body: animates in on swap (no exit animation by design).
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-testid="mdq-question-body"]')
+          ?.setAttribute("data-transition-old", "1");
+      });
       const nextButton = page.locator('button:has-text("Next")').first();
       await nextButton.waitFor({ state: "visible", timeout: 4000 });
+      await armFirstFrame(
+        '[data-testid="mdq-question-body"]:not([data-transition-old])'
+      );
       await nextButton.click();
-      const questionFirst = await firstFrame("mdq-question-body");
+      const questionFirst = await readFirstFrame();
       await page.waitForTimeout(500);
       const questionSettled = await settled("mdq-question-body");
       if (!questionFirst || !questionSettled) {
